@@ -4,26 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82eb3f9d-26e3-4b5b-b276-0e92c46d7f41" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Client/src/main/java/Client.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Client/src/main/java/Header.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Client/src/main/java/SeverHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Server/src/main/java/Header.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Server/src/main/java/RunnableServer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Server/src/main/java/Server.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
+    <list default="true" id="82eb3f9d-26e3-4b5b-b276-0e92c46d7f41" name="Changes" comment="Firsh commit">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,8 +133,16 @@
       <updated>1658971690611</updated>
       <workItem from="1658971695313" duration="1756000" />
       <workItem from="1658985390537" duration="552000" />
-      <workItem from="1658986115868" duration="3792000" />
+      <workItem from="1658986115868" duration="4334000" />
     </task>
+    <task id="LOCAL-00001" summary="Firsh commit">
+      <created>1658990217742</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1658990217742</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,6 +158,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Firsh commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Firsh commit" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
