@@ -14,7 +14,7 @@ public class RunnableServer implements Runnable {
         this.sock = socket;
     }
 
-    public void remove(Socket socket) {
+    public synchronized void remove(Socket socket) {
         for (Socket s : RunnableServer.clients) {
             if (socket == s) {
                 RunnableServer.clients.remove(socket);
