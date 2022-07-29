@@ -9,6 +9,7 @@ public class Server {
 
         while (true) {
             Socket client = serverSocket.accept();
+            //여기도 수정.
             RunnableServer.clients.add(client);
 
             //Thread start
