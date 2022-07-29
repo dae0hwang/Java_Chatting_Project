@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 public class RunnableServer implements Runnable {
     protected Socket sock;
-    //need lock
     protected static ArrayList<Socket> clients = new ArrayList(5);
     //client number of sendmessage
     private ThreadLocal<Integer> sendNum = new ThreadLocal<>();
