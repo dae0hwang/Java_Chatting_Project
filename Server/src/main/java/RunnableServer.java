@@ -80,7 +80,6 @@ public class RunnableServer implements Runnable {
 
         } finally {
             try {
-                //이걸 마지막에 넣자 정보는 받아와야지.
                 if (sock != null) {
                     sock.close();
                     remove(sock);
