@@ -38,7 +38,8 @@ class ServerHandler implements Runnable {
                     System.out.println("타입4로 진입함");
                     String name = dis.readUTF();
                     int sendNum = dis.readInt();
-                    System.out.println(name+"이 나갔습니다 || 보낸 메세지 수: "+sendNum );
+                    int receiveNum = dis.readInt();
+                    System.out.println(name + "이 나갔습니다 || 보낸 메세지 수: " + sendNum + ", 받은 메세지 수 :" + receiveNum);
                 }
             }
         } catch (IOException ex) {

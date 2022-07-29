@@ -9,7 +9,7 @@ public class Server {
 
         while (true) {
             Socket client = serverSocket.accept();
-            RunnableServer.clients.add(client);
+            RunnableServer.clients.put(client, 0);
 
             //Thread start
             RunnableServer myServer = new RunnableServer(client);

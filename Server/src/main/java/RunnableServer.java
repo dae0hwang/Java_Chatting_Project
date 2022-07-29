@@ -2,10 +2,12 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
 
 public class RunnableServer implements Runnable {
     protected Socket sock;
-    protected static ArrayList<Socket> clients = new ArrayList(5);
+    protected static HashMap<Socket, Integer> clients = new HashMap<>();
     //client number of sendmessage
     private ThreadLocal<Integer> sendNum = new ThreadLocal<>();
 
@@ -13,13 +15,13 @@ public class RunnableServer implements Runnable {
         this.sock = socket;
     }
 
-    public synchronized void remove(Socket socket) {
-        for (Socket s : RunnableServer.clients) {
-            if (socket == s) {
-                RunnableServer.clients.remove(socket);
-                break;
-            }
-        }
+    protected synchronized void remove(Socket socket) {
+        RunnableServer.clients.remove(socket);
+    }
+
+    //recieveMessage num++
+    private synchronized void sendNumPlus(Socket socket) {
+        clients.put(socket, clients.getOrDefault(socket, 0) + 1);
     }
 
     @Override
@@ -64,7 +66,9 @@ public class RunnableServer implements Runnable {
                     int serverType = 3333;
                     Header.encodeHeader(serverLength, serverType);
                     serverHeader = Header.bytesHeader;
-                    for (Socket s : clients) {
+                    for (Socket s : clients.keySet()) {
+                        //each client recieveNum ++
+                        sendNumPlus(s);
                         toClient = s.getOutputStream();
                         dos = new DataOutputStream(toClient);
                         dos.write(serverHeader, 0, 8);
@@ -80,10 +84,6 @@ public class RunnableServer implements Runnable {
 
         } finally {
             try {
-                if (sock != null) {
-                    sock.close();
-                    remove(sock);
-                }
                 //type =4444 -> socket.close
                 System.out.println("4타입실행.");
                 byte[] serverHeader = new byte[8];
@@ -91,13 +91,21 @@ public class RunnableServer implements Runnable {
                 int serverType = 4444;
                 Header.encodeHeader(serverLength,serverType);
                 serverHeader = Header.bytesHeader;
-                for (Socket s : clients) {
+                int recieveNum = clients.get(sock);
+                for (Socket s : clients.keySet()) {
+                    sendNumPlus(s);
                     toClient = s.getOutputStream();
                     dos = new DataOutputStream(toClient);
                     dos.write(serverHeader, 0, 8);
                     dos.writeUTF(name);
                     dos.writeInt(sendNum.get());
+                    dos.writeInt(recieveNum);
                     dos.flush();
+                }
+
+                if (sock != null) {
+                    sock.close();
+                    remove(sock);
                 }
                 fromClient = null;
                 toClient = null;
