@@ -27,18 +27,18 @@ class ServerHandler implements Runnable {
                 byte[] receiveBytes = new byte[length];
                 
                 ///type = 3333이면 -> name and Message
-                if (type == 3333) {
+                if (type == Type.MESSAGETOCLIENT.getValue()) {
                     String name = dis.readUTF();
                     dis.readFully(receiveBytes, 0, length);
                     String receiveMessage = new String(receiveBytes);
                     System.out.println(name + ": " + receiveMessage);
                 }
                 //type = 4444 -> close Message
-                else if (type == 4444) {
+                else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
                     String name = dis.readUTF();
                     int sendNum = dis.readInt();
                     int receiveNum = dis.readInt();
-                    System.out.println(name + "is out || Number of sendNum: " + sendNum + ", Number of recieveNum :"+ receiveNum);
+                    System.out.println(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum :"+ receiveNum);
                 }
             }
         } catch (IOException ex) {

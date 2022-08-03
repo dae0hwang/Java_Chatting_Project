@@ -30,9 +30,9 @@ public class Client {
                 byte[] header;
                 int length = bytes.length;
                 if (first) {
-                    type = 1111;
+                    type = Type.RESISTERNAME.getValue();
                 } else {
-                    type = 2222;
+                    type = Type.MESSAGETOSERVER.getValue();
                 }
                 //complete making header
                 Header.encodeHeader(length, type);

@@ -51,16 +51,16 @@ public class RunnableServer implements Runnable {
                 System.out.println("from Client : "+receiveMessage);
 
                 //type =1111 -> name
-                if (type == 1111) {
+                if (type == Type.RESISTERNAME.getValue()) {
                     name = receiveMessage;
                 }
                 //type =2222-> send to other clients(type=3333)
-                else if (type == 2222) {
+                else if (type == Type.MESSAGETOSERVER.getValue()) {
                     //sendmessage num ++
                     sendNum.set(sendNum.get() + 1);
                     byte[] serverHeader;
                     int serverLength = receiveBytes.length;
-                    int serverType = 3333;
+                    int serverType = Type.MESSAGETOCLIENT.getValue();
                     Header.encodeHeader(serverLength, serverType);
                     serverHeader = Header.bytesHeader;
                     for (Socket s : clients.keySet()) {
@@ -87,7 +87,7 @@ public class RunnableServer implements Runnable {
                 //type =4444 -> socket.close
                 byte[] serverHeader;
                 int serverLength = 0;
-                int serverType = 4444;
+                int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
                 Header.encodeHeader(serverLength,serverType);
                 serverHeader = Header.bytesHeader;
                 for (Socket s : clients.keySet()) {
