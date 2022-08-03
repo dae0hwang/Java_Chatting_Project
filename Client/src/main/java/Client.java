@@ -5,7 +5,7 @@ public class Client {
     public static void main(String[] args) {
         Socket sock = null;
         try {
-            sock = new Socket("127.0.0.01", 5510);
+            sock = new Socket("127.0.0.1", 5510);
 
             //receive message Thread start
             ServerHandler chandler = new ServerHandler(sock);
@@ -27,7 +27,7 @@ public class Client {
                 byte[] bytes = sendMessage.getBytes("UTF-8");
 
                 //make Header
-                byte[] header = new byte[8];
+                byte[] header;
                 int length = bytes.length;
                 if (first) {
                     type = 1111;

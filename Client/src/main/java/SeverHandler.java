@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 // Thread for receive message from Server
 class ServerHandler implements Runnable {
-    Socket sock = null;
+    Socket sock;
 
     public ServerHandler(Socket sock) {
         this.sock = sock;
@@ -12,7 +12,7 @@ class ServerHandler implements Runnable {
 
     public void run() {
         InputStream fromServer = null;
-        DataInputStream dis = null;
+        DataInputStream dis;
         try {
             while (true) {
                 fromServer = sock.getInputStream();
@@ -39,7 +39,7 @@ class ServerHandler implements Runnable {
                     String name = dis.readUTF();
                     int sendNum = dis.readInt();
                     int receiveNum = dis.readInt();
-                    System.out.println(name + "이 나갔습니다 || 보낸 메세지 수: " + sendNum + ", 받은 메세지 수 :" + receiveNum);
+                    System.out.println(name + "이 나갔습니다 || 보낸 메세지 수: " + sendNum + ", 받은 메세지 수 :"+ receiveNum);
                 }
             }
         } catch (IOException ex) {

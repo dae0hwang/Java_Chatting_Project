@@ -8,8 +8,10 @@ public class Server {
         System.out.println(serverSocket + " 서버 소켓 생성");
 
         while (true) {
+            System.out.println(RunnableServer.clients);
             Socket client = serverSocket.accept();
-            RunnableServer.clients.put(client, 0);
+            //여기다가 락걸어줘야 함.
+            RunnableServer.clients.put(client,0);
 
             //Thread start
             RunnableServer myServer = new RunnableServer(client);
