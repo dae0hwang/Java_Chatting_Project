@@ -31,7 +31,7 @@ public class RunnableServer implements Runnable {
         String name = null;
 
         try {
-            System.out.println(sock + ": 연결됨");
+            System.out.println(sock + ": Connection");
             while (true) {
                 fromClient = sock.getInputStream();
                 dis = new DataInputStream(fromClient);
@@ -48,7 +48,7 @@ public class RunnableServer implements Runnable {
                 receiveBytes = new byte[length];
                 dis.readFully(receiveBytes, 0, length);
                 String receiveMessage = new String(receiveBytes);
-                System.out.println("서버 받앗는지 확인: "+receiveMessage);
+                System.out.println("from Client : "+receiveMessage);
 
                 //type =1111 -> name
                 if (type == 1111) {
@@ -76,8 +76,8 @@ public class RunnableServer implements Runnable {
                 }
             }
         } catch (IOException ex) {
-            System.out.println(sock + ": 에러(" + ex + ")");
-            System.out.println(name+" 나갔음. ");
+            System.out.println(sock + ": Errof(" + ex + ")");
+            System.out.println(name+" is out ");
 
         } finally {
             try {
@@ -85,7 +85,6 @@ public class RunnableServer implements Runnable {
                 clients.remove(sock);
 
                 //type =4444 -> socket.close
-                System.out.println("4타입실행.");
                 byte[] serverHeader;
                 int serverLength = 0;
                 int serverType = 4444;

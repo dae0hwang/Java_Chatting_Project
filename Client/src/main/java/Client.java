@@ -15,7 +15,7 @@ public class Client {
             //only first client send message type is 1111
             boolean first = true;
             int type;
-            System.out.print("이름을 먼저 등록 하세요 : ");
+            System.out.print("Register your name: ");
 
             while (true) {
                 OutputStream toServer = sock.getOutputStream();
@@ -46,7 +46,7 @@ public class Client {
                 first = false;
             }
         } catch (IOException ex) {
-            System.out.println("연결 종료 (" + ex + ")");
+            System.out.println("Connection termination (" + ex + ")");
         } finally {
             try {
                 if (sock != null) {

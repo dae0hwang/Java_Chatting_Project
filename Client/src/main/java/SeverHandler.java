@@ -35,15 +35,14 @@ class ServerHandler implements Runnable {
                 }
                 //type = 4444 -> close Message
                 else if (type == 4444) {
-                    System.out.println("타입4로 진입함");
                     String name = dis.readUTF();
                     int sendNum = dis.readInt();
                     int receiveNum = dis.readInt();
-                    System.out.println(name + "이 나갔습니다 || 보낸 메세지 수: " + sendNum + ", 받은 메세지 수 :"+ receiveNum);
+                    System.out.println(name + "is out || Number of sendNum: " + sendNum + ", Number of recieveNum :"+ receiveNum);
                 }
             }
         } catch (IOException ex) {
-            System.out.println("연결 종료 (" + ex + ")");
+            System.out.println("Connection termination (" + ex + ")");
         } finally {
             try {
                 if (fromServer != null)
