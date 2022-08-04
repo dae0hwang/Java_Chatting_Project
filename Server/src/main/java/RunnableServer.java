@@ -19,10 +19,6 @@ public class RunnableServer implements Runnable {
         this.sock = socket;
     }
 
-    protected synchronized void remove(Socket socket) {
-        RunnableServer.clients.remove(socket);
-    }
-
     //recieveMessage num++
     private synchronized void sendNumPlus(Socket socket) {
         clients.put(socket, clients.getOrDefault(socket, 0) + 1);
@@ -93,14 +89,20 @@ public class RunnableServer implements Runnable {
 
         } finally {
             try {
+                //remove lock
+                int recieveNum = clients.get(sock);
+                Server.lock.lock();
+                try {
+                    clients.remove(sock);
+                }finally {
+                    Server.lock.unlock();
+                }
                 //type =4444 -> socket.close
-                System.out.println("4타입실행.");
                 byte[] serverHeader = new byte[8];
                 int serverLength = 0;
                 int serverType = 4444;
                 Header.encodeHeader(serverLength,serverType);
                 serverHeader = Header.bytesHeader;
-                int recieveNum = clients.get(sock);
                 for (Socket s : clients.keySet()) {
                     sendNumPlus(s);
                     toClient = s.getOutputStream();
@@ -113,11 +115,6 @@ public class RunnableServer implements Runnable {
                     String toJson2 = objectMapper.writeValueAsString(body);
                     dos.writeUTF(toJson2);
                     dos.flush();
-                }
-
-                if (sock != null) {
-                    sock.close();
-                    remove(sock);
                 }
                 fromClient = null;
                 toClient = null;
