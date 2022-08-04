@@ -1,4 +1,5 @@
 rootProject.name = 'Second_Chatting_Project'
 include 'Server'
 include 'Client'
+include 'SolvedError'
 

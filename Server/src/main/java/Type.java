@@ -9,4 +9,8 @@ public enum Type {
         return value;
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/master
