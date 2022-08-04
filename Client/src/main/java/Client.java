@@ -1,7 +1,10 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.net.Socket;
 
 public class Client {
+    private static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) {
         Socket sock = null;
         try {
@@ -40,7 +43,10 @@ public class Client {
 
                 //output header and message
                 dos.write(header, 0, 8);
-                dos.write(bytes, 0, bytes.length);
+                Body body = new Body();
+                body.setBytes(bytes);
+                String json = objectMapper.writeValueAsString(body);
+                dos.writeUTF(json);
                 dos.flush();
                 //second send messaage is first = false
                 first = false;

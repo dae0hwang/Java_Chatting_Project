@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -5,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RunnableServer implements Runnable {
     protected Socket sock;
+    private static ObjectMapper objectMapper = new ObjectMapper();
     protected static HashMap<Socket, Integer> clients = new HashMap<>();
     //client number of sendmessage
     private ThreadLocal<Integer> sendNum = new ThreadLocal<>();
@@ -46,7 +50,9 @@ public class RunnableServer implements Runnable {
                 //second input body message
                 byte[] receiveBytes;
                 receiveBytes = new byte[length];
-                dis.readFully(receiveBytes, 0, length);
+                String inputJson = dis.readUTF();
+                JsonNode jsonNode = objectMapper.readTree(inputJson);
+                receiveBytes = jsonNode.get("bytes").binaryValue();
                 String receiveMessage = new String(receiveBytes);
                 System.out.println("from Client : "+receiveMessage);
 
@@ -69,8 +75,11 @@ public class RunnableServer implements Runnable {
                         toClient = s.getOutputStream();
                         dos = new DataOutputStream(toClient);
                         dos.write(serverHeader, 0, 8);
-                        dos.writeUTF(name);
-                        dos.write(receiveBytes, 0, length);
+                        Body body = new Body();
+                        body.setName(name);
+                        body.setBytes(receiveBytes);
+                        String toJson = objectMapper.writeValueAsString(body);
+                        dos.writeUTF(toJson);
                         dos.flush();
                     }
                 }
@@ -94,9 +103,12 @@ public class RunnableServer implements Runnable {
                     toClient = s.getOutputStream();
                     dos = new DataOutputStream(toClient);
                     dos.write(serverHeader, 0, 8);
-                    dos.writeUTF(name);
-                    dos.writeInt(sendNum.get());
-                    dos.writeInt(recieveNum);
+                    Body body = new Body();
+                    body.setName(name);
+                    body.setSendNum(sendNum.get());
+                    body.setRecieveNum(recieveNum);
+                    String toJson2 = objectMapper.writeValueAsString(body);
+                    dos.writeUTF(toJson2);
                     dos.flush();
                 }
             } catch (IOException ex) {

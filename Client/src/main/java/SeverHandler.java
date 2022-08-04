@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
@@ -9,6 +12,8 @@ class ServerHandler implements Runnable {
     public ServerHandler(Socket sock) {
         this.sock = sock;
     }
+
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public void run() {
         InputStream fromServer = null;
@@ -28,16 +33,20 @@ class ServerHandler implements Runnable {
                 
                 ///type = 3333이면 -> name and Message
                 if (type == Type.MESSAGETOCLIENT.getValue()) {
-                    String name = dis.readUTF();
-                    dis.readFully(receiveBytes, 0, length);
+                    String fromJson = dis.readUTF();
+                    JsonNode jsonNode = objectMapper.readTree(fromJson);
+                    String name = jsonNode.get("name").asText();
+                    receiveBytes = jsonNode.get("bytes").binaryValue();
                     String receiveMessage = new String(receiveBytes);
                     System.out.println(name + ": " + receiveMessage);
                 }
                 //type = 4444 -> close Message
                 else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
-                    String name = dis.readUTF();
-                    int sendNum = dis.readInt();
-                    int receiveNum = dis.readInt();
+                    String fromJson = dis.readUTF();
+                    JsonNode jsonNode = objectMapper.readTree(fromJson);
+                    String name = jsonNode.get("name").asText();
+                    int sendNum = jsonNode.get("sendNum").asInt();
+                    int receiveNum = jsonNode.get("recieveNum").asInt();
                     System.out.println(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum :"+ receiveNum);
                 }
             }
