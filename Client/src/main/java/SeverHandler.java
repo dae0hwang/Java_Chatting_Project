@@ -1,10 +1,14 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 
 // Thread for receive message from Server
 class ServerHandler implements Runnable {
-    Socket sock = null;
+    private static ObjectMapper objectMapper = new ObjectMapper();
+    Socket sock;
 
     public ServerHandler(Socket sock) {
         this.sock = sock;
@@ -12,7 +16,7 @@ class ServerHandler implements Runnable {
 
     public void run() {
         InputStream fromServer = null;
-        DataInputStream dis = null;
+        DataInputStream dis;
         try {
             while (true) {
                 fromServer = sock.getInputStream();
@@ -25,25 +29,35 @@ class ServerHandler implements Runnable {
                 int length = Header.messageLength;
                 int type = Header.messageType;
                 byte[] receiveBytes = new byte[length];
-                
+
                 ///type = 3333이면 -> name and Message
-                if (type == 3333) {
-                    String name = dis.readUTF();
-                    dis.readFully(receiveBytes, 0, length);
-                    String receiveMessage = new String(receiveBytes);
-                    System.out.println(name + ": " + receiveMessage);
+                if (type == Type.MESSAGETOCLIENT.getValue()) {
+                    String json = dis.readUTF();
+                    JsonNode jsonNode = objectMapper.readTree(json);
+                    String _name = jsonNode.get("name").asText();
+                    byte[] _bytes = jsonNode.get("bytes").binaryValue();
+                    String _receiveMessage = new String(_bytes);
+
+//                    String name = dis.readUTF();
+//                    dis.readFully(receiveBytes, 0, length);
+//                    String receiveMessage = new String(receiveBytes);
+                    System.out.println(_name + ": " + _receiveMessage);
                 }
                 //type = 4444 -> close Message
-                else if (type == 4444) {
-                    System.out.println("타입4로 진입함");
-                    String name = dis.readUTF();
-                    int sendNum = dis.readInt();
-                    int receiveNum = dis.readInt();
-                    System.out.println(name + "이 나갔습니다 || 보낸 메세지 수: " + sendNum + ", 받은 메세지 수 :" + receiveNum);
+                else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
+                    String json = dis.readUTF();
+                    JsonNode jsonNode = objectMapper.readTree(json);
+                    String _name = jsonNode.get("name").asText();
+                    int _sendNum = jsonNode.get("sendNum").asInt();
+                    int _receiveNum = jsonNode.get("recieveNum").asInt();
+//                    String name = dis.readUTF();
+//                    int sendNum = dis.readInt();
+//                    int receiveNum = dis.readInt();
+                    System.out.println(_name + " is out || Number of sendMessageNum: " + _sendNum + ", Number of recieveMessageNum :"+ _receiveNum);
                 }
             }
         } catch (IOException ex) {
-            System.out.println("연결 종료 (" + ex + ")");
+            System.out.println("Connection termination (" + ex + ")");
         } finally {
             try {
                 if (fromServer != null)

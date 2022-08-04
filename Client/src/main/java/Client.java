@@ -1,11 +1,14 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
 import java.net.Socket;
 
 public class Client {
+    private static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) {
         Socket sock = null;
         try {
-            sock = new Socket("127.0.0.01", 5510);
+            sock = new Socket("127.0.0.1", 5510);
 
             //receive message Thread start
             ServerHandler chandler = new ServerHandler(sock);
@@ -15,7 +18,7 @@ public class Client {
             //only first client send message type is 1111
             boolean first = true;
             int type;
-            System.out.print("이름을 먼저 등록 하세요 : ");
+            System.out.print("Register your name: ");
 
             while (true) {
                 OutputStream toServer = sock.getOutputStream();
@@ -27,12 +30,12 @@ public class Client {
                 byte[] bytes = sendMessage.getBytes("UTF-8");
 
                 //make Header
-                byte[] header = new byte[8];
+                byte[] header;
                 int length = bytes.length;
                 if (first) {
-                    type = 1111;
+                    type = Type.RESISTERNAME.getValue();
                 } else {
-                    type = 2222;
+                    type = Type.MESSAGETOSERVER.getValue();
                 }
                 //complete making header
                 Header.encodeHeader(length, type);
@@ -40,13 +43,17 @@ public class Client {
 
                 //output header and message
                 dos.write(header, 0, 8);
-                dos.write(bytes, 0, bytes.length);
+                Body body = new Body();
+                body.setBytes(bytes);
+                String json = objectMapper.writeValueAsString(body);
+                dos.writeUTF(json);
+//                dos.write(bytes, 0, bytes.length);
                 dos.flush();
                 //second send messaage is first = false
                 first = false;
             }
         } catch (IOException ex) {
-            System.out.println("연결 종료 (" + ex + ")");
+            System.out.println("Connection termination (" + ex + ")");
         } finally {
             try {
                 if (sock != null) {
