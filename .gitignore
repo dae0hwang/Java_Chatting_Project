@@ -49,3 +49,4 @@ bin/
 *.iml
 !**/src/main/**/out/
 /SolvedError/
+/ImagePractice/

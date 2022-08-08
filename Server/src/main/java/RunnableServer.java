@@ -56,16 +56,22 @@ public class RunnableServer implements Runnable {
                 System.out.println("서버 받앗는지 확인: "+receiveMessage);
 
                 //type =1111 -> name
-                if (type == 1111) {
+                if (type == Type.RESISTERNAME.getValue()) {
                     name = receiveMessage;
                 }
-                //type =2222-> send to other clients
-                else if (type == 2222) {
+                //type == 2222-> send to other clients
+                //type == 5555 -> send image to clients
+                else {
                     //sendmessage num ++
                     sendNum.set(sendNum.get() + 1);
                     byte[] serverHeader = new byte[8];
                     int serverLength = receiveBytes.length;
-                    int serverType = 3333;
+                    int serverType = 0;
+                    if (type == Type.MESSAGETOSERVER.getValue()) {
+                        serverType = Type.MESSAGETOCLIENT.getValue();
+                    } else if (type == Type.IMAGETOSERVER.getValue()) {
+                        serverType = Type.IMAGETOCLIENT.getValue();
+                    }
                     Header.encodeHeader(serverLength, serverType);
                     serverHeader = Header.bytesHeader;
                     for (Socket s : clients.keySet()) {
