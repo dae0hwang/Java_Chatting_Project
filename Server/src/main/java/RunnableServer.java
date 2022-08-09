@@ -112,13 +112,18 @@ public class RunnableServer implements Runnable {
                 int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
                 Header.encodeHeader(serverLength,serverType);
                 serverHeader = Header.bytesHeader;
-                for (Socket s : clients.keySet()) {
-                    sendNumPlus(s);
-                    toClient = s.getOutputStream();
-                    dos = new DataOutputStream(toClient);
-                    dos.write(serverHeader, 0, 8);
-                    dos.write(sendJsonBytes, 0, serverLength);
-                    dos.flush();
+                Server.lock.lock();
+                try {
+                    for (Socket s : clients.keySet()) {
+                        sendNumPlus(s);
+                        toClient = s.getOutputStream();
+                        dos = new DataOutputStream(toClient);
+                        dos.write(serverHeader, 0, 8);
+                        dos.write(sendJsonBytes, 0, serverLength);
+                        dos.flush();
+                    }
+                }finally {
+                    Server.lock.unlock();
                 }
                 fromClient = null;
                 toClient = null;
