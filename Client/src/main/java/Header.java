@@ -27,7 +27,6 @@ public class Header {
         bytesHeader[5] = typeBytes[1];
         bytesHeader[6] = typeBytes[2];
         bytesHeader[7] = typeBytes[3];
-
     }
 
     //int -> byte[4]
