@@ -58,7 +58,6 @@ class ServerHandler implements Runnable {
                     String name = inputBody.getName();
                     byte[] imageBytes = inputBody.getBytes();
                     byteArrayConvertToImageFile(imageBytes);
-                    System.out.println(name + "이 보낸 사진을 저장했습니다.");
                 }
             }
         } catch (IOException ex) {
@@ -81,5 +80,14 @@ class ServerHandler implements Runnable {
         Files.createDirectories(path);
         String fileName = path.toString() + "\\copy.jpg";
         ImageIO.write(bufferedImage, "jpg", new File(fileName));
+
+        //open the download image by mspaint.
+        ProcessBuilder processBuilder2 = new ProcessBuilder(
+            "C:\\Windows\\System32\\mspaint.exe",
+            fileName);
+        processBuilder2.start();
+
+        //print image nmae and download success message
+        System.out.println("image download success. filename is " +fileName);
     }
 }
