@@ -8,12 +8,13 @@ public class Client {
     private static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) {
         Socket sock = null;
+        Header makeHeader = new Header();
         try {
             sock = new Socket("127.0.0.1", 5510);
 
             //receive message Thread start
-            ServerHandler chandler = new ServerHandler(sock);
-            Thread receiveThread = new Thread(chandler);
+            ServerHandler handler = new ServerHandler(sock);
+            Thread receiveThread = new Thread(handler);
             receiveThread.start();
 
             //only first client send message type is 1111
@@ -53,10 +54,10 @@ public class Client {
                 body.setBytes(outputBytes);
                 byte[] sendJsonBytes = objectMapper.writeValueAsBytes(body);
 
-                //implenebt message header
+                //implement message header
                 int length = sendJsonBytes.length;
-                Header.encodeHeader(length, type);
-                header = Header.bytesHeader;
+                makeHeader.encodeHeader(length, type);
+                header = makeHeader.bytesHeader;
 
                 //send message to server
                 dos.write(header, 0, 8);

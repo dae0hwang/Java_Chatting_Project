@@ -23,6 +23,7 @@ class ServerHandler implements Runnable {
     public void run() {
         InputStream fromServer = null;
         DataInputStream dis;
+        Header makeHeader = new Header();
         try {
             while (true) {
                 fromServer = sock.getInputStream();
@@ -31,9 +32,9 @@ class ServerHandler implements Runnable {
                 //First input messgae Header
                 byte[] header = new byte[8];
                 dis.readFully(header, 0, 8);
-                Header.decodeHeader(header);
-                int length = Header.messageLength;
-                int type = Header.messageType;
+                makeHeader.decodeHeader(header);
+                int length = makeHeader.messageLength;
+                int type = makeHeader.messageType;
                 byte[] receiveBytes =new byte[length];
 
                 //Second input message body
@@ -55,7 +56,6 @@ class ServerHandler implements Runnable {
                 }
                 //type == 6666 -> image download
                 else if (type == Type.IMAGETOCLIENT.getValue()) {
-                    String name = inputBody.getName();
                     byte[] imageBytes = inputBody.getBytes();
                     byteArrayConvertToImageFile(imageBytes);
                 }

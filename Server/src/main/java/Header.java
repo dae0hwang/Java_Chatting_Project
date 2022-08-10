@@ -1,14 +1,14 @@
 import java.util.Arrays;
 
 public class Header {
-    static int messageLength;
-    static int messageType;
-    static byte[] bytesHeader = new byte[8];
-    static byte[] lengthBytes = new byte[4];
-    static byte[] typeBytes = new byte[4];
+    protected int messageLength;
+    protected int messageType;
+    protected byte[] bytesHeader = new byte[8];
+    private byte[] lengthBytes = new byte[4];
+    private byte[] typeBytes = new byte[4];
 
     //headerbyte -> int length and int type
-    public static void decodeHeader(byte[] header) {
+    public void decodeHeader(byte[] header) {
         byte[] lengthBytes = Arrays.copyOfRange(header, 0, 4);
         byte[] typeBytes = Arrays.copyOfRange(header, 4, 8);
         messageLength = byteArrayToInt(lengthBytes);
@@ -16,7 +16,7 @@ public class Header {
     }
 
     //int -> byte[]
-    public static void encodeHeader(int length, int type) {
+    public void encodeHeader(int length, int type) {
         lengthBytes = intToByteArray(length);
         typeBytes = intToByteArray(type);
         bytesHeader[0] = lengthBytes[0];
@@ -27,11 +27,10 @@ public class Header {
         bytesHeader[5] = typeBytes[1];
         bytesHeader[6] = typeBytes[2];
         bytesHeader[7] = typeBytes[3];
-
     }
 
     //int -> byte[4]
-    public static byte[] intToByteArray(int value) {
+    private static byte[] intToByteArray(int value) {
         byte[] byteArray = new byte[4];
         byteArray[0] = (byte)(value >> 24);
         byteArray[1] = (byte)(value >> 16);
@@ -41,7 +40,7 @@ public class Header {
     }
 
     //byte[4] -> int
-    public static int byteArrayToInt(byte bytes[]) {
+    private static int byteArrayToInt(byte bytes[]) {
         return ((((int)bytes[0] & 0xff) << 24) |
             (((int)bytes[1] & 0xff) << 16) |
             (((int)bytes[2] & 0xff) << 8) |

@@ -15,13 +15,13 @@ public class RunnableServer implements Runnable {
     //client number of sendmessage
     private ThreadLocal<Integer> sendNum = new ThreadLocal<>();
 
-    RunnableServer(Socket socket) {
-        this.sock = socket;
-    }
-
     //recieveMessage num++
     private synchronized void sendNumPlus(Socket socket) {
         clients.put(socket, clients.getOrDefault(socket, 0) + 1);
+    }
+
+    RunnableServer(Socket socket) {
+        this.sock = socket;
     }
 
     @Override
@@ -32,6 +32,8 @@ public class RunnableServer implements Runnable {
         DataInputStream dis;
         DataOutputStream dos;
         String name = null;
+        //impleament header for eocoding and decoding.
+        Header makeHeader = new Header();
 
         try {
             System.out.println(sock + ": 연결됨");
@@ -42,9 +44,9 @@ public class RunnableServer implements Runnable {
                 //first input message header
                 byte[] header = new byte[8];
                 dis.readFully(header, 0, 8);
-                Header.decodeHeader(header);
-                int length = Header.messageLength;
-                int type = Header.messageType;
+                makeHeader.decodeHeader(header);
+                int length = makeHeader.messageLength;
+                int type = makeHeader.messageType;
 
                 //second input message body
                 byte[] receiveBytes;
@@ -75,8 +77,8 @@ public class RunnableServer implements Runnable {
                     } else if (type == Type.IMAGETOSERVER.getValue()) {
                         serverType = Type.IMAGETOCLIENT.getValue();
                     }
-                    Header.encodeHeader(serverLength, serverType);
-                    serverHeader = Header.bytesHeader;
+                    makeHeader.encodeHeader(serverLength, serverType);
+                    serverHeader = makeHeader.bytesHeader;
                     Server.lock.lock();
                     try {
                         for (Socket s : clients.keySet()) {
@@ -115,8 +117,8 @@ public class RunnableServer implements Runnable {
                 byte[] serverHeader;
                 int serverLength = sendJsonBytes.length;
                 int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
-                Header.encodeHeader(serverLength,serverType);
-                serverHeader = Header.bytesHeader;
+                makeHeader.encodeHeader(serverLength,serverType);
+                serverHeader = makeHeader.bytesHeader;
                 Server.lock.lock();
                 try {
                     for (Socket s : clients.keySet()) {
