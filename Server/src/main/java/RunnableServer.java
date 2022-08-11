@@ -1,18 +1,14 @@
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
 
 public class RunnableServer implements Runnable {
     protected Socket sock;
     private static ObjectMapper objectMapper = new ObjectMapper();
     protected static HashMap<Socket, Integer> clients = new HashMap<>();
-    //client number of sendmessage
+    //client number of send message
     private ThreadLocal<Integer> sendNum = new ThreadLocal<>();
 
     //recieveMessage num++
@@ -32,7 +28,7 @@ public class RunnableServer implements Runnable {
         DataInputStream dis;
         DataOutputStream dos;
         String name = null;
-        //impleament header for eocoding and decoding.
+        //implement header for encoding and decoding.
         Header makeHeader = new Header();
 
         try {
@@ -54,31 +50,26 @@ public class RunnableServer implements Runnable {
                 dis.readFully(receiveBytes,0,length);
                 Body inputBody = objectMapper.readValue(receiveBytes, Body.class);
                 byte[] contentsBytes = inputBody.getBytes();
-                System.out.println("server message received messgae header and body");
+                System.out.println("server message received message header and body");
 
-                //type =1111 -> name
+                //process input data
+                //type == 1111 -> set name
                 if (type == Type.RESISTERNAME.getValue()) {
                     name = new String(contentsBytes);
                 }
-                //type == 2222-> send string to clients
+                //type == 2222 -> send string to clients
                 //type == 5555 -> send image to clients
                 else {
                     //sendmessage num ++
                     sendNum.set(sendNum.get() + 1);
-                    Body outputBody = new Body();
-                    outputBody.setName(name);
-                    outputBody.setBytes(contentsBytes);
-                    byte[] sendJsonBytes = objectMapper.writeValueAsBytes(outputBody);
-                    byte[] serverHeader ;
-                    int serverLength = sendJsonBytes.length;
-                    int serverType = 0;
-                    if (type == Type.MESSAGETOSERVER.getValue()) {
-                        serverType = Type.MESSAGETOCLIENT.getValue();
-                    } else if (type == Type.IMAGETOSERVER.getValue()) {
-                        serverType = Type.IMAGETOCLIENT.getValue();
-                    }
-                    makeHeader.encodeHeader(serverLength, serverType);
-                    serverHeader = makeHeader.bytesHeader;
+
+                    //implement sendJsonBytes
+                    byte[] sendJsonBytes = implementBody(name, contentsBytes);
+
+                    //implement serverHeader
+                    byte[] serverHeader = implementServerHeader(type, sendJsonBytes);
+
+                    // send message to clients.
                     Server.lock.lock();
                     try {
                         for (Socket s : clients.keySet()) {
@@ -87,7 +78,7 @@ public class RunnableServer implements Runnable {
                             toClient = s.getOutputStream();
                             dos = new DataOutputStream(toClient);
                             dos.write(serverHeader, 0, 8);
-                            dos.write(sendJsonBytes,0,serverLength);
+                            dos.write(sendJsonBytes,0,sendJsonBytes.length);
                             dos.flush();
                         }
                     }finally {
@@ -108,25 +99,22 @@ public class RunnableServer implements Runnable {
                 }finally {
                     Server.lock.unlock();
                 }
-                //type =4444 -> socket.close
-                Body outputBody = new Body();
-                outputBody.setName(name);
-                outputBody.setSendNum(sendNum.get());
-                outputBody.setRecieveNum(recieveNum);
-                byte[] sendJsonBytes = objectMapper.writeValueAsBytes(outputBody);
-                byte[] serverHeader;
-                int serverLength = sendJsonBytes.length;
-                int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
-                makeHeader.encodeHeader(serverLength,serverType);
-                serverHeader = makeHeader.bytesHeader;
-                Server.lock.lock();
+
+                //when socket is closed. server send information of client to others.
+                //implement close message body.
+                byte[] sendJsonBytes = implementCloseBody(name, sendNum.get(), recieveNum);
+
+                //implement close message header.
+                byte[] serverHeader = implementCloseHeader(sendJsonBytes);
+
+                // send close message to clients.
                 try {
                     for (Socket s : clients.keySet()) {
                         sendNumPlus(s);
                         toClient = s.getOutputStream();
                         dos = new DataOutputStream(toClient);
                         dos.write(serverHeader, 0, 8);
-                        dos.write(sendJsonBytes, 0, serverLength);
+                        dos.write(sendJsonBytes, 0, sendJsonBytes.length);
                         dos.flush();
                     }
                 }finally {
@@ -138,4 +126,41 @@ public class RunnableServer implements Runnable {
             }
         }
     }
+
+    private static byte[] implementBody(String name, byte[] contentsBytes) throws JsonProcessingException {
+        Body outputBody = new Body();
+        outputBody.setName(name);
+        outputBody.setBytes(contentsBytes);
+        return objectMapper.writeValueAsBytes(outputBody);
+    }
+
+    private static byte[] implementServerHeader(int type, byte[] sendJsonBytes) {
+        Header makeHeader = new Header();
+        int serverType = 0;
+        int serverLength = sendJsonBytes.length;
+        if (type == Type.MESSAGETOSERVER.getValue()) {
+            serverType = Type.MESSAGETOCLIENT.getValue();
+        } else if (type == Type.IMAGETOSERVER.getValue()) {
+            serverType = Type.IMAGETOCLIENT.getValue();
+        }
+        makeHeader.encodeHeader(serverLength, serverType);
+        return makeHeader.bytesHeader;
+    }
+
+    private static byte[] implementCloseBody(String name, int sendNum, int recieveNum) throws JsonProcessingException {
+        Body outputBody = new Body();
+        outputBody.setName(name);
+        outputBody.setSendNum(sendNum);
+        outputBody.setRecieveNum(recieveNum);
+        return objectMapper.writeValueAsBytes(outputBody);
+    }
+
+    private static byte[] implementCloseHeader( byte[] sendJsonBytes) {
+        Header makeHeader = new Header();
+        int serverLength = sendJsonBytes.length;
+        int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
+        makeHeader.encodeHeader(serverLength, serverType);
+        return makeHeader.bytesHeader;
+    }
+
 }

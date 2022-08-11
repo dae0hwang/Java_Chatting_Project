@@ -1,5 +1,5 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -26,33 +26,21 @@ public class Client {
                 OutputStream toServer = sock.getOutputStream();
                 DataOutputStream dos = new DataOutputStream(toServer);
 
-                //String sendmessage or imagePath or name
+                //input data for Name or StringMessage or ImageFile
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 String sendMessage = br.readLine();
                 byte[] outputBytes;
                 byte[] header;
+                byte[] sendJsonBytes;
 
-                if (first) {
-                    type = Type.RESISTERNAME.getValue();
-                } else if (sendMessage.length() >= 8 && sendMessage.substring(0,8).equals("image://")) {
-                    type = Type.IMAGETOSERVER.getValue();
-                }else {
-                    type = Type.MESSAGETOSERVER.getValue();
-                }
+                //set Type
+                type = setType(first, sendMessage);
 
-                //if Type == IMAGETOSERVER -> bytes = image file bytes
-                if (type == Type.IMAGETOSERVER.getValue()) {
-                    String path = sendMessage.substring(8, sendMessage.length());
-                    File file = new File(path);
-                    outputBytes = Files.readAllBytes(file.toPath());
-                } else {
-                    outputBytes = sendMessage.getBytes("UTF-8");
-                }
+                //convert String to bytes
+                outputBytes = convertToBytes(type, sendMessage);
 
                 //implement message body
-                Body body = new Body();
-                body.setBytes(outputBytes);
-                byte[] sendJsonBytes = objectMapper.writeValueAsBytes(body);
+                sendJsonBytes = implementMessageBody(outputBytes);
 
                 //implement message header
                 int length = sendJsonBytes.length;
@@ -77,5 +65,31 @@ public class Client {
             } catch (IOException ex) {
             }
         }
+    }
+
+    private static int setType(boolean first, String sendMessage) {
+        if (first) {
+            return Type.RESISTERNAME.getValue();
+        } else if (sendMessage.length() >= 8 && sendMessage.substring(0,8).equals("image://")) {
+            return Type.IMAGETOSERVER.getValue();
+        }else {
+            return Type.MESSAGETOSERVER.getValue();
+        }
+    }
+
+    private static byte[] convertToBytes(int type, String sendMessage) throws IOException {
+        if (type == Type.IMAGETOSERVER.getValue()) {
+            String path = sendMessage.substring(8, sendMessage.length());
+            File file = new File(path);
+            return Files.readAllBytes(file.toPath());
+        } else {
+            return sendMessage.getBytes("UTF-8");
+        }
+    }
+
+    private static byte[] implementMessageBody(byte[] outputBytes) throws JsonProcessingException {
+        Body body = new Body();
+        body.setBytes(outputBytes);
+        return objectMapper.writeValueAsBytes(body);
     }
 }

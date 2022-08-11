@@ -12,13 +12,14 @@ public class Server {
         while (true) {
             System.out.println(RunnableServer.clients);
             Socket client = serverSocket.accept();
-            //lock
+            //add client into server hashMap
             lock.lock();
             try {
                 RunnableServer.clients.put(client,0);
             }finally {
                 lock.unlock();
             }
+
             //Thread start
             RunnableServer myServer = new RunnableServer(client);
             Thread severThread = new Thread(myServer);
