@@ -12,7 +12,7 @@ public class RunnableServer implements Runnable {
     private ThreadLocal<Integer> sendNum = new ThreadLocal<>();
 
     //recieveMessage num++
-    private synchronized void sendNumPlus(Socket socket) {
+    private synchronized void receiveNumPlus(Socket socket) {
         clients.put(socket, clients.getOrDefault(socket, 0) + 1);
     }
 
@@ -73,13 +73,15 @@ public class RunnableServer implements Runnable {
                     Server.lock.lock();
                     try {
                         for (Socket s : clients.keySet()) {
-                            //each client recieveNum ++
-                            sendNumPlus(s);
-                            toClient = s.getOutputStream();
-                            dos = new DataOutputStream(toClient);
-                            dos.write(serverHeader, 0, 8);
-                            dos.write(sendJsonBytes,0,sendJsonBytes.length);
-                            dos.flush();
+                            if (s != sock) {
+                                //each client receiveNum ++
+                                receiveNumPlus(s);
+                                toClient = s.getOutputStream();
+                                dos = new DataOutputStream(toClient);
+                                dos.write(serverHeader, 0, 8);
+                                dos.write(sendJsonBytes,0,sendJsonBytes.length);
+                                dos.flush();
+                            }
                         }
                     }finally {
                         Server.lock.unlock();
@@ -110,7 +112,7 @@ public class RunnableServer implements Runnable {
                 // send close message to clients.
                 try {
                     for (Socket s : clients.keySet()) {
-                        sendNumPlus(s);
+                        receiveNumPlus(s);
                         toClient = s.getOutputStream();
                         dos = new DataOutputStream(toClient);
                         dos.write(serverHeader, 0, 8);
