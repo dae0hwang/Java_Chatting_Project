@@ -1,5 +1,6 @@
 import java.util.Arrays;
 
+//HeaderTypeConversion
 public class Header {
     protected int messageLength;
     protected int messageType;

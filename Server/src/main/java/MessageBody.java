@@ -5,7 +5,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Body {
+public class MessageBody {
     private String name;
     private int sendNum;
     private int recieveNum;
