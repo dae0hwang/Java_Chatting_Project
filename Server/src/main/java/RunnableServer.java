@@ -78,9 +78,9 @@ public class RunnableServer implements Runnable {
     }
 
     private static MessageBody recieveMessageBodyFromClient(DataInputStream dis, byte[] header) throws IOException {
-        HeaderConverter headerConverter = new HeaderConverter();
-        headerConverter.decodeHeader(header);
-        int length = headerConverter.messageLength;
+        Header makeHeader = new Header();
+        makeHeader.decodeHeader(header);
+        int length = makeHeader.messageLength;
         byte[] receiveBytes = new byte[length];
         dis.readFully(receiveBytes,0,length);
         MessageBody inputMessageBody = objectMapper.readValue(receiveBytes, MessageBody.class);
@@ -91,9 +91,9 @@ public class RunnableServer implements Runnable {
     private MessagePacket processingMessageBody(MessageBody messageBody, byte[] header,
                                                 ThreadLocal<Integer> threadLocalClientSendMessageNum)
         throws JsonProcessingException {
-        HeaderConverter headerConverter = new HeaderConverter();
-        headerConverter.decodeHeader(header);
-        int type = headerConverter.messageType;
+        Header makeHeader = new Header();
+        makeHeader.decodeHeader(header);
+        int type = makeHeader.messageType;
         if (type == Type.RESISTERNAME.getValue()) {
             this.name = new String(messageBody.getBytes());
             return null;
@@ -123,7 +123,7 @@ public class RunnableServer implements Runnable {
     }
 
     private static byte[] implementServerHeader(int type, byte[] sendJsonBytes) {
-        HeaderConverter headerConverter = new HeaderConverter();
+        Header makeHeader = new Header();
         int serverType = 0;
         int serverLength = sendJsonBytes.length;
         if (type == Type.MESSAGETOSERVER.getValue()) {
@@ -131,8 +131,8 @@ public class RunnableServer implements Runnable {
         } else if (type == Type.IMAGETOSERVER.getValue()) {
             serverType = Type.IMAGETOCLIENT.getValue();
         }
-        headerConverter.encodeHeader(serverLength, serverType);
-        return headerConverter.bytesHeader;
+        makeHeader.encodeHeader(serverLength, serverType);
+        return makeHeader.bytesHeader;
     }
 
     private MessagePacket implementCloseMessagePacket(int clientRecieveMessageNum) throws JsonProcessingException {
@@ -152,11 +152,11 @@ public class RunnableServer implements Runnable {
     }
 
     private static byte[] implementCloseHeader( byte[] sendJsonBytes) {
-        HeaderConverter headerConverter = new HeaderConverter();
+        Header makeHeader = new Header();
         int serverLength = sendJsonBytes.length;
         int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
-        headerConverter.encodeHeader(serverLength, serverType);
-        return headerConverter.bytesHeader;
+        makeHeader.encodeHeader(serverLength, serverType);
+        return makeHeader.bytesHeader;
     }
 
 
@@ -164,9 +164,9 @@ public class RunnableServer implements Runnable {
                                                 MessagePacket messagePacket) throws IOException {
         byte[] serverHeader = messagePacket.serverHeader;
         byte[] sendJsonBytes = messagePacket.sendJsonBytes;
-        HeaderConverter headerConverter = new HeaderConverter();
-        headerConverter.decodeHeader(serverHeader);
-        int type = headerConverter.messageType;
+        Header makeHeader = new Header();
+        makeHeader.decodeHeader(serverHeader);
+        int type = makeHeader.messageType;
         if (type == Type.MESSAGETOCLIENT.getValue() || type == Type.IMAGETOCLIENT.getValue()
             || type == Type.CLIENTCLOSEMESSAGE.getValue()) {
             lockForClientsConcurrency.lock();

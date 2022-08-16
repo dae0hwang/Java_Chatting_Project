@@ -40,7 +40,7 @@ class ServerHandler implements Runnable {
 
                 ///type == 3333 -> name and Message
                 if (type == Type.MESSAGETOCLIENT.getValue()) {
-                    printNameAndMesssage(inputBody);
+                    printNameAndMsssage(inputBody);
                 }
                 //type == 4444 -> close Message
                 else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
@@ -64,17 +64,17 @@ class ServerHandler implements Runnable {
         }
     }
 
-    private static void printNameAndMesssage(Body inputBody) {
+    private static void printNameAndMsssage(Body inputBody) {
         String name = inputBody.getName();
         String receiveMessage = new String(inputBody.getBytes());
-        System.out.print(name + ": " + receiveMessage+ "\n");
+        System.out.println(name + ": " + receiveMessage);
     }
 
     private static void printCloseMessage(Body inputBody) {
         String name = inputBody.getName();
         int sendNum = inputBody.getSendNum();
         int receiveNum = inputBody.getRecieveNum();
-        System.out.print(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum : "+ receiveNum+ "\n");
+        System.out.println(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum :"+ receiveNum);
     }
 
     private static void byteArrayConvertToImageFile(Body inputBody) throws IOException {

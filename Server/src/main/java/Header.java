@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 //HeaderTypeConversion
-public class HeaderConverter {
+public class Header {
     protected int messageLength;
     protected int messageType;
     protected byte[] bytesHeader = new byte[8];
