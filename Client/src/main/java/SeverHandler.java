@@ -36,7 +36,7 @@ class ServerHandler implements Runnable {
 
                 //Second input message body
                 dis.readFully(receiveBytes,0,length);
-                Body inputBody = objectMapper.readValue(receiveBytes, Body.class);
+                MessageBody inputBody = objectMapper.readValue(receiveBytes, MessageBody.class);
 
                 ///type == 3333 -> name and Message
                 if (type == Type.MESSAGETOCLIENT.getValue()) {
@@ -64,20 +64,20 @@ class ServerHandler implements Runnable {
         }
     }
 
-    private static void printNameAndMesssage(Body inputBody) {
+    private static void printNameAndMesssage(MessageBody inputBody) {
         String name = inputBody.getName();
         String receiveMessage = new String(inputBody.getBytes());
         System.out.print(name + ": " + receiveMessage+ "\n");
     }
 
-    private static void printCloseMessage(Body inputBody) {
+    private static void printCloseMessage(MessageBody inputBody) {
         String name = inputBody.getName();
         int sendNum = inputBody.getSendNum();
         int receiveNum = inputBody.getRecieveNum();
         System.out.print(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum : "+ receiveNum+ "\n");
     }
 
-    private static void byteArrayConvertToImageFile(Body inputBody) throws IOException {
+    private static void byteArrayConvertToImageFile(MessageBody inputBody) throws IOException {
         byte[] imageBytes = inputBody.getBytes();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
         BufferedImage bufferedImage = ImageIO.read(inputStream);
