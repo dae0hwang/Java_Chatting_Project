@@ -12,6 +12,5 @@ public enum Type {
     IMAGETOCLIENT(6666);
 
     private final int value;
-
 }
 

@@ -46,9 +46,9 @@ public class Client {
         messageBody.setBytes(resisterName);
         byte[] sendJsonBytes = objectMapper.writeValueAsBytes(messageBody);
         int type = Type.RESISTERNAME.getValue();
-        Header makeHeader = new Header();
-        makeHeader.encodeHeader(sendJsonBytes.length,type);
-        byte[] clientHeader = makeHeader.bytesHeader;
+        HeaderConverter headerConverter = new HeaderConverter();
+        headerConverter.encodeHeader(sendJsonBytes.length,type);
+        byte[] clientHeader = headerConverter.bytesHeader;
         dos.write(clientHeader,0,clientHeader.length);
         dos.write(sendJsonBytes, 0, sendJsonBytes.length);
         dos.flush();
@@ -82,9 +82,9 @@ public class Client {
         MessageBody messageBody = new MessageBody();
         messageBody.setBytes(inputStringtobytes);
         byte[] sendJsonBytes = objectMapper.writeValueAsBytes(messageBody);
-        Header makeHeader = new Header();
-        makeHeader.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
-        byte[] header = makeHeader.bytesHeader;
+        HeaderConverter headerConverter = new HeaderConverter();
+        headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
+        byte[] header = headerConverter.bytesHeader;
         OutputStream toServer = socket.getOutputStream();
         DataOutputStream dos = new DataOutputStream(toServer);
         dos.write(header, 0, header.length);
@@ -102,9 +102,9 @@ public class Client {
         MessageBody messageBody = new MessageBody();
         messageBody.setBytes(imageFileBytes);
         byte[] sendJsonBytes = objectMapper.writeValueAsBytes(messageBody);
-        Header makeHeader = new Header();
-        makeHeader.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
-        byte[] header = makeHeader.bytesHeader;
+        HeaderConverter headerConverter = new HeaderConverter();
+        headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
+        byte[] header = headerConverter.bytesHeader;
         OutputStream toServer = socket.getOutputStream();
         DataOutputStream dos = new DataOutputStream(toServer);
         dos.write(header, 0, header.length);

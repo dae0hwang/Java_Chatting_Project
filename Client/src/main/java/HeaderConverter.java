@@ -1,11 +1,10 @@
 import java.util.Arrays;
 
-public class Header {
+//HeaderTypeConversion
+public class HeaderConverter {
     protected int messageLength;
     protected int messageType;
     protected byte[] bytesHeader = new byte[8];
-    private byte[] lengthBytes = new byte[4];
-    private byte[] typeBytes = new byte[4];
 
     //headerbyte -> int length and int type
     public void decodeHeader(byte[] header) {
@@ -17,8 +16,8 @@ public class Header {
 
     //int -> byte[]
     public void encodeHeader(int length, int type) {
-        lengthBytes = intToByteArray(length);
-        typeBytes = intToByteArray(type);
+        byte[] lengthBytes = intToByteArray(length);
+        byte[] typeBytes = intToByteArray(type);
         bytesHeader[0] = lengthBytes[0];
         bytesHeader[1] = lengthBytes[1];
         bytesHeader[2] = lengthBytes[2];

@@ -37,7 +37,7 @@ class ServerHandler implements Runnable {
                     printCloseMessage(messageBody);
                 }
                 else if (messageBodyType == Type.IMAGETOCLIENT.getValue()) {
-                    byteArrayConvertToImageFile(messageBody);
+                    saveAndOpenImageFile(messageBody);
                 }
             }
         } catch (IOException ex) {
@@ -57,9 +57,9 @@ class ServerHandler implements Runnable {
         int messageHeaderSize = 8;
         byte[] inputMessageHeader = new byte[messageHeaderSize];
         dataInputStream.readFully(inputMessageHeader,0, messageHeaderSize);
-        Header makeHeader = new Header();
-        makeHeader.decodeHeader(inputMessageHeader);
-        HeaderInformation headerInformation = new HeaderInformation(makeHeader.messageLength, makeHeader.messageType);
+        HeaderConverter headerConverter = new HeaderConverter();
+        headerConverter.decodeHeader(inputMessageHeader);
+        HeaderInformation headerInformation = new HeaderInformation(headerConverter.messageLength, headerConverter.messageType);
         return headerInformation;
     }
 
@@ -93,7 +93,7 @@ class ServerHandler implements Runnable {
         System.out.print(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum : "+ receiveNum+ "\n");
     }
 
-    private static void byteArrayConvertToImageFile(MessageBody messageBody) throws IOException {
+    private static void saveAndOpenImageFile(MessageBody messageBody) throws IOException {
         byte[] imageBytes = messageBody.getBytes();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
         BufferedImage bufferedImage = ImageIO.read(inputStream);

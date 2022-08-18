@@ -49,10 +49,10 @@ public class RunnableServer implements Runnable {
                 fromClient = sock.getInputStream();
                 dataInputStream = new DataInputStream(fromClient);
                 byte[] header = recieveMessageHeaderFromClient(dataInputStream);
-                MessageBody inputMessageBody = recieveMessageBodyFromClient(dataInputStream, header);
+                MessageBody recieveMessageBody = recieveMessageBodyFromClient(dataInputStream, header);
                 //Processing message Body to set name or make message packet(header and body)
                 MessagePacket messagePacket =
-                processingMessageBody(inputMessageBody, header, threadLocalClientSendMessageNum);
+                processingMessageBody(recieveMessageBody, header, threadLocalClientSendMessageNum);
                 if (messagePacket != null) {
                     broadcastAllUser(clients, sock, messagePacket);
                 }
