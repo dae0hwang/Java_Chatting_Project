@@ -17,7 +17,6 @@ public class Client {
             sendResisterName(sock);
             while (true) {
                 InputStringAndType inputStringAndType = storeInputStringAndSetType();
-                //타입에따라 보내기.
                 Type type = inputStringAndType.type;
                 switch (type) {
                     case MESSAGETOSERVER : sendStringMessage(sock, inputStringAndType);

@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-// Thread for receive message from Server
 class ServerHandler implements Runnable {
     static Socket sock;
 
@@ -19,36 +18,26 @@ class ServerHandler implements Runnable {
 
     public void run() {
         InputStream fromServer = null;
-        DataInputStream dis;
-        Header makeHeader = new Header();
-        byte[] header = new byte[8];
+        DataInputStream dataInputStream;
         try {
             while (true) {
                 fromServer = sock.getInputStream();
-                dis = new DataInputStream(fromServer);
+                dataInputStream = new DataInputStream(fromServer);
 
-                //First input message Header
-                dis.readFully(header, 0, 8);
-                makeHeader.decodeHeader(header);
-                int length = makeHeader.messageLength;
-                int type = makeHeader.messageType;
-                byte[] receiveBytes =new byte[length];
+                HeaderInformation headerInformation = recieveMessageHeader(dataInputStream);
+                int messageBodyLength = headerInformation.messageBodyLength;
+                int messageBodyType = headerInformation.messageBodyType;
 
-                //Second input message body
-                dis.readFully(receiveBytes,0,length);
-                MessageBody inputBody = objectMapper.readValue(receiveBytes, MessageBody.class);
+                MessageBody messageBody = receiveMessageBody(dataInputStream, messageBodyLength);
 
-                ///type == 3333 -> name and Message
-                if (type == Type.MESSAGETOCLIENT.getValue()) {
-                    printNameAndMesssage(inputBody);
+                if (messageBodyType == Type.MESSAGETOCLIENT.getValue()) {
+                    printNameAndMessage(messageBody);
                 }
-                //type == 4444 -> close Message
-                else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
-                    printCloseMessage(inputBody);
+                else if (messageBodyType == Type.CLIENTCLOSEMESSAGE.getValue()) {
+                    printCloseMessage(messageBody);
                 }
-                //type == 6666 -> image download
-                else if (type == Type.IMAGETOCLIENT.getValue()) {
-                    byteArrayConvertToImageFile(inputBody);
+                else if (messageBodyType == Type.IMAGETOCLIENT.getValue()) {
+                    byteArrayConvertToImageFile(messageBody);
                 }
             }
         } catch (IOException ex) {
@@ -64,21 +53,48 @@ class ServerHandler implements Runnable {
         }
     }
 
-    private static void printNameAndMesssage(MessageBody inputBody) {
-        String name = inputBody.getName();
-        String receiveMessage = new String(inputBody.getBytes());
+    private static HeaderInformation recieveMessageHeader(DataInputStream dataInputStream) throws IOException {
+        int messageHeaderSize = 8;
+        byte[] inputMessageHeader = new byte[messageHeaderSize];
+        dataInputStream.readFully(inputMessageHeader,0, messageHeaderSize);
+        Header makeHeader = new Header();
+        makeHeader.decodeHeader(inputMessageHeader);
+        HeaderInformation headerInformation = new HeaderInformation(makeHeader.messageLength, makeHeader.messageType);
+        return headerInformation;
+    }
+
+    static class HeaderInformation {
+        int messageBodyLength;
+        int messageBodyType;
+        HeaderInformation(int length, int type) {
+            this.messageBodyLength = length;
+            this.messageBodyType = type;
+        }
+    }
+
+    private static MessageBody receiveMessageBody(DataInputStream dataInputStream, int messageBodyLength)
+        throws IOException {
+        byte[] messageBodyBytes = new byte[messageBodyLength];
+        dataInputStream.readFully(messageBodyBytes, 0, messageBodyLength);
+        MessageBody messageBody = objectMapper.readValue(messageBodyBytes, MessageBody.class);
+        return messageBody;
+    }
+
+    private static void printNameAndMessage(MessageBody messageBody) {
+        String name = messageBody.getName();
+        String receiveMessage = new String(messageBody.getBytes());
         System.out.print(name + ": " + receiveMessage+ "\n");
     }
 
-    private static void printCloseMessage(MessageBody inputBody) {
-        String name = inputBody.getName();
-        int sendNum = inputBody.getSendNum();
-        int receiveNum = inputBody.getRecieveNum();
+    private static void printCloseMessage(MessageBody messageBody) {
+        String name = messageBody.getName();
+        int sendNum = messageBody.getSendNum();
+        int receiveNum = messageBody.getRecieveNum();
         System.out.print(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum : "+ receiveNum+ "\n");
     }
 
-    private static void byteArrayConvertToImageFile(MessageBody inputBody) throws IOException {
-        byte[] imageBytes = inputBody.getBytes();
+    private static void byteArrayConvertToImageFile(MessageBody messageBody) throws IOException {
+        byte[] imageBytes = messageBody.getBytes();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
         BufferedImage bufferedImage = ImageIO.read(inputStream);
         String directory = Integer.toString(sock.getLocalPort());
