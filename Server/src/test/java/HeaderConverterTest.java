@@ -3,12 +3,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HeaderTest {
-    Header header;
+class HeaderConverterTest {
+    HeaderConverter header;
 
     @BeforeEach
     void init() {
-        header = new Header();
+        header = new HeaderConverter();
     }
 
     @Test

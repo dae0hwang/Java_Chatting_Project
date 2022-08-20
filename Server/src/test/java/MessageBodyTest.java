@@ -1,24 +1,22 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class BodyTest {
-    Body body;
+class MessageBodyTest {
+    MessageBody messageBody;
 
     @BeforeEach
     void init() {
-        body = new Body();
+        messageBody = new MessageBody();
     }
 
     @Test
     void getName() {
         //given
-        body.setName("A");
+        messageBody.setName("A");
         //when
-        String expected = body.getName();
+        String expected = messageBody.getName();
         //then
         assertEquals(expected, "A");
     }
@@ -26,9 +24,9 @@ class BodyTest {
     @Test
     void getSendNum() {
         //given
-        body.setSendNum(10);
+        messageBody.setSendNum(10);
         //when
-        int expected = body.getSendNum();
+        int expected = messageBody.getSendNum();
         //then
         assertEquals(expected, 10);
     }
@@ -36,9 +34,9 @@ class BodyTest {
     @Test
     void getRecieveNum() {
         //given
-        body.setRecieveNum(10);
+        messageBody.setRecieveNum(10);
         //when
-        int expected = body.getRecieveNum();
+        int expected = messageBody.getRecieveNum();
         //then
         assertEquals(expected, 10);
     }
@@ -46,9 +44,9 @@ class BodyTest {
     @Test
     void getBytes() {
         //given
-        body.setBytes(new byte[]{1,1,1,1});
+        messageBody.setBytes(new byte[]{1,1,1,1});
         //when
-        byte[] expected = body.getBytes();
+        byte[] expected = messageBody.getBytes();
         byte[] result = new byte[]{1, 1, 1, 1};
         //then
         assertArrayEquals(expected, result);
@@ -57,9 +55,9 @@ class BodyTest {
     @Test
     void setName() {
         //given
-        body.setName("A");
+        messageBody.setName("A");
         //when
-        String expected = body.getName();
+        String expected = messageBody.getName();
         //then
         assertEquals(expected, "A");
 
@@ -68,9 +66,9 @@ class BodyTest {
     @Test
     void setSendNum() {
         //given
-        body.setSendNum(10);
+        messageBody.setSendNum(10);
         //when
-        int expected = body.getSendNum();
+        int expected = messageBody.getSendNum();
         //then
         assertEquals(expected, 10);
     }
@@ -78,9 +76,9 @@ class BodyTest {
     @Test
     void setRecieveNum() {
         //given
-        body.setRecieveNum(10);
+        messageBody.setRecieveNum(10);
         //when
-        int expected = body.getRecieveNum();
+        int expected = messageBody.getRecieveNum();
         //then
         assertEquals(expected, 10);
     }
@@ -88,9 +86,9 @@ class BodyTest {
     @Test
     void setBytes() {
         //given
-        body.setBytes(new byte[]{1,1,1,1});
+        messageBody.setBytes(new byte[]{1,1,1,1});
         //when
-        byte[] expected = body.getBytes();
+        byte[] expected = messageBody.getBytes();
         byte[] result = new byte[]{1, 1, 1, 1};
         //then
         assertArrayEquals(expected, result);
@@ -99,13 +97,13 @@ class BodyTest {
     @Test
     void testToString() {
         //given
-        body.setName("A");
-        body.setSendNum(10);
-        body.setRecieveNum(10);
-        body.setBytes(new byte[]{1,1,1,1});
+        messageBody.setName("A");
+        messageBody.setSendNum(10);
+        messageBody.setRecieveNum(10);
+        messageBody.setBytes(new byte[]{1,1,1,1});
         //when
-        String expected = body.toString();
-        String result = "Body(name=A, sendNum=10, recieveNum=10, bytes=[1, 1, 1, 1])";
+        String expected = messageBody.toString();
+        String result = "MessageBody(name=A, sendNum=10, recieveNum=10, bytes=[1, 1, 1, 1])";
         //then
         assertEquals(expected, result);
     }

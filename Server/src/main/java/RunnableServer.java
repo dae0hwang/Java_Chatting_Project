@@ -44,7 +44,7 @@ public class RunnableServer implements Runnable {
         InputStream fromClient;
         DataInputStream dataInputStream;
         try {
-            System.out.println(sock + ": 연결됨");
+            System.out.println(sock + ": is connected");
             while (true) {
                 fromClient = sock.getInputStream();
                 dataInputStream = new DataInputStream(fromClient);
