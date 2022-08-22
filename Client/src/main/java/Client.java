@@ -41,10 +41,10 @@ public class Client {
         OutputStream toServer = socket.getOutputStream();
         DataOutputStream dos = new DataOutputStream(toServer);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        byte[] resisterName = br.readLine().getBytes();
-        MessageBody messageBody = new MessageBody();
-        messageBody.setBytes(resisterName);
-        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(messageBody);
+        String name = br.readLine();
+        ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
+        resisterNameMessageBodyDto.setName(name);
+        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
         int type = Type.RESISTERNAME.getValue();
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length,type);
@@ -79,9 +79,9 @@ public class Client {
     private static void sendStringMessage(Socket socket, InputStringAndType inputStringAndType)
         throws IOException {
         byte[] inputStringtobytes = inputStringAndType.inputString.getBytes("UTF-8");
-        MessageBody messageBody = new MessageBody();
-        messageBody.setBytes(inputStringtobytes);
-        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(messageBody);
+        StringMessageBodyDto stringMessageBodyDto = new StringMessageBodyDto();
+        stringMessageBodyDto.setStringMessageBytes(inputStringtobytes);
+        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(stringMessageBodyDto);
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
         byte[] header = headerConverter.bytesHeader;
@@ -99,9 +99,9 @@ public class Client {
         String filePath = inputString.substring(filePathStartIdx, inputString.length());
         File file = new File(filePath);
         byte[] imageFileBytes = Files.readAllBytes(file.toPath());
-        MessageBody messageBody = new MessageBody();
-        messageBody.setBytes(imageFileBytes);
-        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(messageBody);
+        ImageMessageBodyDto imageMessageBodyDto = new ImageMessageBodyDto();
+        imageMessageBodyDto.setImageMessageBytes(imageFileBytes);
+        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(imageMessageBodyDto);
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
         byte[] header = headerConverter.bytesHeader;

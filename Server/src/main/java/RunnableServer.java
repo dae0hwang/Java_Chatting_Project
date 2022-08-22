@@ -49,12 +49,30 @@ public class RunnableServer implements Runnable {
                 fromClient = sock.getInputStream();
                 dataInputStream = new DataInputStream(fromClient);
                 byte[] header = recieveMessageHeaderFromClient(dataInputStream);
-                MessageBody recieveMessageBody = recieveMessageBodyFromClient(dataInputStream, header);
-                //Processing message Body to set name or make message packet(header and body)
-                MessagePacket messagePacket =
-                processingMessageBody(recieveMessageBody, header, threadLocalClientSendMessageNum);
-                if (messagePacket != null) {
-                    broadcastAllUser(clients, sock, messagePacket);
+                byte[] messageBodyBytes = receiveMessageBodyFromClient(dataInputStream, header);
+                Type messageType = readType(header);
+                switch (messageType) {
+                    case RESISTERNAME:
+                        resisterName(messageBodyBytes);
+                        break;
+                    case MESSAGETOSERVER:
+                        threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
+                        byte[] stringMessageJsonBytes = implementStringMessageJsonBytes(messageBodyBytes);
+                        byte[] stringMessageServerHeader =
+                            implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
+                        MessagePacket stringMessagePacket =
+                            new MessagePacket(stringMessageJsonBytes, stringMessageServerHeader);
+                        broadcastAllUser(clients, sock, stringMessagePacket);
+                        break;
+                    case IMAGETOSERVER:
+                        threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
+                        byte[] imageMessageJsonBytes = implementImageMessageJsonBytes(messageBodyBytes);
+                        byte[] imageMessageServerHeader =
+                            implementImageMessageServerHeaderBytes(imageMessageJsonBytes);
+                        MessagePacket ImagemssagePacket =
+                            new MessagePacket(imageMessageJsonBytes, imageMessageServerHeader);
+                        broadcastAllUser(clients, sock, ImagemssagePacket);
+                        break;
                 }
             }
         } catch (IOException ex) {
@@ -77,60 +95,64 @@ public class RunnableServer implements Runnable {
         return header;
     }
 
-    private static MessageBody recieveMessageBodyFromClient(DataInputStream dis, byte[] header) throws IOException {
+    private static byte[] receiveMessageBodyFromClient(DataInputStream dis, byte[] header) throws IOException {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.decodeHeader(header);
         int length = headerConverter.messageLength;
         byte[] receiveBytes = new byte[length];
         dis.readFully(receiveBytes,0,length);
-        MessageBody inputMessageBody = objectMapper.readValue(receiveBytes, MessageBody.class);
         System.out.println("server message received message header and body");
-        return inputMessageBody;
+        return receiveBytes;
     }
 
-    private MessagePacket processingMessageBody(MessageBody messageBody, byte[] header,
-                                                ThreadLocal<Integer> threadLocalClientSendMessageNum)
-        throws JsonProcessingException {
+    private static Type readType(byte[] header) {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.decodeHeader(header);
-        int type = headerConverter.messageType;
-        if (type == Type.RESISTERNAME.getValue()) {
-            this.name = new String(messageBody.getBytes());
-            return null;
-        } else {
-            threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
-            byte[] sendJsonBytes = implementMessageBody(this.name, messageBody.getBytes());
-            byte[] serverHeader = implementServerHeader(type, sendJsonBytes);
-            MessagePacket messagePacket = new MessagePacket(sendJsonBytes, serverHeader);
-            return messagePacket;
+        int intType = headerConverter.messageType;
+        if (intType == Type.RESISTERNAME.getValue()) {
+            return Type.RESISTERNAME;
+        } else if (intType == Type.MESSAGETOSERVER.getValue()) {
+            return Type.MESSAGETOSERVER;
+        } else if (intType == Type.IMAGETOSERVER.getValue()) {
+            return Type.IMAGETOSERVER;
         }
+        return null;
     }
 
-    class MessagePacket {
-        byte[] sendJsonBytes;
-        byte[] serverHeader;
-        MessagePacket(byte[] sendJsonBytes, byte[] serverHeader) {
-            this.sendJsonBytes = sendJsonBytes;
-            this.serverHeader = serverHeader;
-        }
+    private void resisterName(byte[] messageBodyBytes) throws IOException {
+        ResisterNameMessageBodyDto resisterNameMessageBodyDto =
+            objectMapper.readValue(messageBodyBytes, ResisterNameMessageBodyDto.class);
+        this.name = resisterNameMessageBodyDto.getName();
     }
 
-    private static byte[] implementMessageBody(String name, byte[] contentsBytes) throws JsonProcessingException {
-        MessageBody outputBody = new MessageBody();
-        outputBody.setName(name);
-        outputBody.setBytes(contentsBytes);
-        return objectMapper.writeValueAsBytes(outputBody);
+    private byte[] implementStringMessageJsonBytes(byte[] messageBodyBytes) throws IOException {
+        StringMessageBodyDto stringMessageBodyDto =
+            objectMapper.readValue(messageBodyBytes, StringMessageBodyDto.class);
+        stringMessageBodyDto.setName(this.name);
+        byte[] stringMessageJsonBytes = objectMapper.writeValueAsBytes(stringMessageBodyDto);
+        return stringMessageJsonBytes;
     }
 
-    private static byte[] implementServerHeader(int type, byte[] sendJsonBytes) {
+    private static byte[] implementStringMessageServerHeaderBytes(byte[] stringMessageJsonBytes) {
         HeaderConverter headerConverter = new HeaderConverter();
-        int serverType = 0;
-        int serverLength = sendJsonBytes.length;
-        if (type == Type.MESSAGETOSERVER.getValue()) {
-            serverType = Type.MESSAGETOCLIENT.getValue();
-        } else if (type == Type.IMAGETOSERVER.getValue()) {
-            serverType = Type.IMAGETOCLIENT.getValue();
-        }
+        int serverType = Type.MESSAGETOCLIENT.getValue();
+        int serverLength = stringMessageJsonBytes.length;
+        headerConverter.encodeHeader(serverLength, serverType);
+        return headerConverter.bytesHeader;
+    }
+
+    private byte[] implementImageMessageJsonBytes(byte[] messageBodyBytes) throws IOException {
+        ImageMessageBodyDto imageMessageBodyDto =
+            objectMapper.readValue(messageBodyBytes, ImageMessageBodyDto.class);
+        imageMessageBodyDto.setName(this.name);
+        byte[] imageMessageJsonBytes = objectMapper.writeValueAsBytes(imageMessageBodyDto);
+        return imageMessageJsonBytes;
+    }
+
+    private static byte[] implementImageMessageServerHeaderBytes(byte[] imageMessageJsonBytes) {
+        HeaderConverter headerConverter = new HeaderConverter();
+        int serverType = Type.IMAGETOCLIENT.getValue();
+        int serverLength = imageMessageJsonBytes.length;
         headerConverter.encodeHeader(serverLength, serverType);
         return headerConverter.bytesHeader;
     }
@@ -144,11 +166,11 @@ public class RunnableServer implements Runnable {
     }
 
     private static byte[] implementCloseBody(String name, int sendNum, int recieveNum) throws JsonProcessingException {
-        MessageBody outputBody = new MessageBody();
-        outputBody.setName(name);
-        outputBody.setSendNum(sendNum);
-        outputBody.setRecieveNum(recieveNum);
-        return objectMapper.writeValueAsBytes(outputBody);
+        CloseMessageBodyDto closeMessageBodyDto = new CloseMessageBodyDto();
+        closeMessageBodyDto.setName(name);
+        closeMessageBodyDto.setSendNum(sendNum);
+        closeMessageBodyDto.setRecieveNum(recieveNum);
+        return objectMapper.writeValueAsBytes(closeMessageBodyDto);
     }
 
     private static byte[] implementCloseHeader( byte[] sendJsonBytes) {
@@ -158,7 +180,6 @@ public class RunnableServer implements Runnable {
         headerConverter.encodeHeader(serverLength, serverType);
         return headerConverter.bytesHeader;
     }
-
 
     private static void broadcastAllUser(HashMap<Socket, Integer> clients, Socket sock,
                                                 MessagePacket messagePacket) throws IOException {

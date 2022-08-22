@@ -26,18 +26,18 @@ class ServerHandler implements Runnable {
 
                 HeaderInformation headerInformation = recieveMessageHeader(dataInputStream);
                 int messageBodyLength = headerInformation.messageBodyLength;
-                int messageBodyType = headerInformation.messageBodyType;
-
-                MessageBody messageBody = receiveMessageBody(dataInputStream, messageBodyLength);
-
-                if (messageBodyType == Type.MESSAGETOCLIENT.getValue()) {
-                    printNameAndMessage(messageBody);
-                }
-                else if (messageBodyType == Type.CLIENTCLOSEMESSAGE.getValue()) {
-                    printCloseMessage(messageBody);
-                }
-                else if (messageBodyType == Type.IMAGETOCLIENT.getValue()) {
-                    saveAndOpenImageFile(messageBody);
+                Type messageBodyType = headerInformation.messageBodyType;
+                byte[] receiveMessageBodyBytes = recieveMessageBodyBytes(dataInputStream, messageBodyLength);
+                switch (messageBodyType) {
+                    case MESSAGETOCLIENT:
+                        printNameAndMessage(receiveMessageBodyBytes);
+                        break;
+                    case CLIENTCLOSEMESSAGE:
+                        printCloseMessage(receiveMessageBodyBytes);
+                        break;
+                    case IMAGETOCLIENT:
+                        saveAndOpenImageFile(receiveMessageBodyBytes);
+                        break;
                 }
             }
         } catch (IOException ex) {
@@ -59,49 +59,59 @@ class ServerHandler implements Runnable {
         dataInputStream.readFully(inputMessageHeader,0, messageHeaderSize);
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.decodeHeader(inputMessageHeader);
-        HeaderInformation headerInformation = new HeaderInformation(headerConverter.messageLength, headerConverter.messageType);
+        Type type;
+        if (headerConverter.messageType == Type.MESSAGETOCLIENT.getValue()) {
+            type = Type.MESSAGETOCLIENT;
+        } else if (headerConverter.messageType == Type.IMAGETOCLIENT.getValue()) {
+            type = Type.IMAGETOCLIENT;
+        } else {
+            type = Type.CLIENTCLOSEMESSAGE;
+        }
+        HeaderInformation headerInformation = new HeaderInformation(headerConverter.messageLength, type);
         return headerInformation;
     }
 
     static class HeaderInformation {
         int messageBodyLength;
-        int messageBodyType;
-        HeaderInformation(int length, int type) {
+        Type messageBodyType;
+        HeaderInformation(int length, Type type) {
             this.messageBodyLength = length;
             this.messageBodyType = type;
         }
     }
 
-    private static MessageBody receiveMessageBody(DataInputStream dataInputStream, int messageBodyLength)
-        throws IOException {
+    private static byte[] recieveMessageBodyBytes(DataInputStream dataInputStream, int messageBodyLength) throws IOException {
         byte[] messageBodyBytes = new byte[messageBodyLength];
         dataInputStream.readFully(messageBodyBytes, 0, messageBodyLength);
-        MessageBody messageBody = objectMapper.readValue(messageBodyBytes, MessageBody.class);
-        return messageBody;
+        return messageBodyBytes;
     }
 
-    private static void printNameAndMessage(MessageBody messageBody) {
-        String name = messageBody.getName();
-        String receiveMessage = new String(messageBody.getBytes());
+    private static void printNameAndMessage(byte[] messageBodybytes) throws IOException {
+        StringMessageBodyDto stringMessageBodyDto =
+            objectMapper.readValue(messageBodybytes, StringMessageBodyDto.class);
+        String name = stringMessageBodyDto.getName();
+        String receiveMessage = new String(stringMessageBodyDto.getStringMessageBytes());
         System.out.print(name + ": " + receiveMessage+ "\n");
     }
 
-    private static void printCloseMessage(MessageBody messageBody) {
-        String name = messageBody.getName();
-        int sendNum = messageBody.getSendNum();
-        int receiveNum = messageBody.getRecieveNum();
+    private static void printCloseMessage(byte[] messageBodyBytes) throws IOException {
+        CloseMessageBodyDto closeMessageBodyDto =
+            objectMapper.readValue(messageBodyBytes, CloseMessageBodyDto.class);
+        String name = closeMessageBodyDto.getName();
+        int sendNum = closeMessageBodyDto.getSendNum();
+        int receiveNum = closeMessageBodyDto.getRecieveNum();
         System.out.print(name + " is out || Number of sendMessageNum: " + sendNum + ", Number of recieveMessageNum : "+ receiveNum+ "\n");
     }
 
-    private static void saveAndOpenImageFile(MessageBody messageBody) throws IOException {
-        byte[] imageBytes = messageBody.getBytes();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
-        BufferedImage bufferedImage = ImageIO.read(inputStream);
+    private static void saveAndOpenImageFile(byte[] messageBodyBytes) throws IOException {
+        ImageMessageBodyDto imageMessageBodyDto =
+            objectMapper.readValue(messageBodyBytes, ImageMessageBodyDto.class);
+        byte[] imageBytes = imageMessageBodyDto.getImageMessageBytes();
         String directory = Integer.toString(sock.getLocalPort());
         Path path = Paths.get("C:\\Users\\geung\\Downloads" + "\\" + directory);
         Files.createDirectories(path);
         String fileName = path.toString() + "\\copy.jpg";
-        ImageIO.write(bufferedImage, "jpg", new File(fileName));
+        Files.write(Path.of(fileName), imageBytes);
         //open the download image by mspaint.
         ProcessBuilder processBuilder2 = new ProcessBuilder(
             "C:\\Windows\\System32\\mspaint.exe"
