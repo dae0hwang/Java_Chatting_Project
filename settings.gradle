@@ -4,4 +4,5 @@ include 'Client'
 include 'SolvedError'
 include 'ImagePractice'
 include 'ImageSocket'
+include 'MockTest'
 
