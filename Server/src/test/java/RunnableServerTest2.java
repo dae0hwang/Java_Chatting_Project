@@ -142,18 +142,18 @@
 //        assertArrayEquals(expected, result);
 //    }
 //
-    @Test
-    void testImplementCloseHeader() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        //given
-        Class partypes[] = new Class[1];
-        partypes[0] = byte[].class;
-        Method method = runnableServer.getClass().getDeclaredMethod("implementCloseHeader", partypes);
-        method.setAccessible(true);
-        //when
-        byte[] expected = (byte[]) method.invoke(runnableServer, new byte[]{1, 1});
-        byte[] result = {0, 0, 0, 2, 0, 0, 17, 92};
-        //then
-        assertArrayEquals(expected, result);
+//    @Test
+//    void testImplementCloseHeader() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//        //given
+//        Class partypes[] = new Class[1];
+//        partypes[0] = byte[].class;
+//        Method method = runnableServer.getClass().getDeclaredMethod("implementCloseHeader", partypes);
+//        method.setAccessible(true);
+//        //when
+//        byte[] expected = (byte[]) method.invoke(runnableServer, new byte[]{1, 1});
+//        byte[] result = {0, 0, 0, 2, 0, 0, 17, 92};
+//        //then
+//        assertArrayEquals(expected, result);
 //    }
 //
 //    @Test
