@@ -30,7 +30,7 @@ public class RunnableServer implements Runnable {
         }
     }
     private ThreadLocal<Integer> threadLocalClientSendMessageNum = new ThreadLocal<>();
-    private static  void clientReceiveMessageNumPlus1(Socket socket) {
+    protected static  void clientReceiveMessageNumPlus1(Socket socket) {
         clients.put(socket, clients.getOrDefault(socket, 0) + 1);
     }
 
@@ -40,6 +40,7 @@ public class RunnableServer implements Runnable {
 
     @Override
     public void run() {
+        RunnableServerService serverService = new RunnableServerService();
         threadLocalClientSendMessageNum.set(0);
         InputStream fromClient;
         DataInputStream dataInputStream;
@@ -48,30 +49,47 @@ public class RunnableServer implements Runnable {
             while (true) {
                 fromClient = sock.getInputStream();
                 dataInputStream = new DataInputStream(fromClient);
-                byte[] header = recieveMessageHeaderFromClient(dataInputStream);
-                byte[] messageBodyBytes = receiveMessageBodyFromClient(dataInputStream, header);
-                Type messageType = readType(header);
+//                byte[] header = recieveMessageHeaderFromClient(dataInputStream);
+                byte[] header = serverService.recieveMessageHeaderFromClient(dataInputStream);
+//                byte[] messageBodyBytes = receiveMessageBodyFromClient(dataInputStream, header);
+                byte[] messageBodyBytes = serverService.receiveMessageBodyFromClient(dataInputStream, header);
+//                Type messageType = readType(header);
+                Type messageType = serverService.readType(header);
                 switch (messageType) {
                     case RESISTERNAME:
-                        resisterName(messageBodyBytes);
+//                        resisterName(messageBodyBytes);
+                        this.name = serverService.resisterName(messageBodyBytes);
                         break;
                     case MESSAGETOSERVER:
                         threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
-                        byte[] stringMessageJsonBytes = implementStringMessageJsonBytes(messageBodyBytes);
-                        byte[] stringMessageServerHeader =
-                            implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
+//                        byte[] stringMessageJsonBytes = implementStringMessageJsonBytes(messageBodyBytes);
+                        byte[] stringMessageJsonBytes
+                            = serverService.implementStringMessageJsonBytes(messageBodyBytes, this.name);
+//                        byte[] stringMessageServerHeader
+//                            = implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
+                        byte[] stringMessageServerHeader
+                            = serverService.implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
                         MessagePacket stringMessagePacket =
                             new MessagePacket(stringMessageJsonBytes, stringMessageServerHeader);
-                        broadcastAllUser(clients, sock, stringMessagePacket);
+                        //wait
+//                        broadcastAllUser(clients, sock, stringMessagePacket);
+                        serverService.broadcastAllUser(clients, sock, stringMessagePacket,lockForClientsConcurrency);
                         break;
                     case IMAGETOSERVER:
                         threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
-                        byte[] imageMessageJsonBytes = implementImageMessageJsonBytes(messageBodyBytes);
+//                        byte[] imageMessageJsonBytes
+//                            = implementImageMessageJsonBytes(messageBodyBytes);
+                        byte[] imageMessageJsonBytes
+                            = serverService.implementImageMessageJsonBytes(messageBodyBytes,this.name);
+//                        byte[] imageMessageServerHeader =
+//                            implementImageMessageServerHeaderBytes(imageMessageJsonBytes);
                         byte[] imageMessageServerHeader =
-                            implementImageMessageServerHeaderBytes(imageMessageJsonBytes);
+                            serverService.implementImageMessageServerHeaderBytes(imageMessageJsonBytes);
                         MessagePacket ImagemssagePacket =
                             new MessagePacket(imageMessageJsonBytes, imageMessageServerHeader);
-                        broadcastAllUser(clients, sock, ImagemssagePacket);
+                        //wait
+//                        broadcastAllUser(clients, sock, ImagemssagePacket);
+                        serverService.broadcastAllUser(clients, sock, ImagemssagePacket, lockForClientsConcurrency);
                         break;
                 }
             }
@@ -82,8 +100,15 @@ public class RunnableServer implements Runnable {
             try {
                 int clientRecieveMessageNum = clients.get(sock);
                 removeClientInClients(sock);
-                MessagePacket closeMessagePacket = implementCloseMessagePacket(clientRecieveMessageNum);
-                broadcastAllUser(clients, sock, closeMessagePacket);
+//                MessagePacket closeMessagePacket = implementCloseMessagePacket(clientRecieveMessageNum);
+                byte[] closeMessageJsonBytes
+                    = serverService.implementCloseBody
+                    (this.name, threadLocalClientSendMessageNum.get(), clientRecieveMessageNum);
+                byte[] closeMessageServerHeader = serverService.implementCloseHeader(closeMessageJsonBytes);
+                MessagePacket closeMessagePacket = new MessagePacket(closeMessageJsonBytes, closeMessageServerHeader);
+                //wait
+//                broadcastAllUser(clients, sock, closeMessagePacket);
+                serverService.broadcastAllUser(clients, sock, closeMessagePacket,lockForClientsConcurrency);
             } catch (IOException ex) {
             }
         }
@@ -157,13 +182,13 @@ public class RunnableServer implements Runnable {
         return headerConverter.bytesHeader;
     }
 
-    private MessagePacket implementCloseMessagePacket(int clientRecieveMessageNum) throws JsonProcessingException {
-        byte[] sendJsonBytes = implementCloseBody(this.name, threadLocalClientSendMessageNum.get(),
-            clientRecieveMessageNum);
-        byte[] serverHeader = implementCloseHeader(sendJsonBytes);
-        MessagePacket messagePacket = new MessagePacket(sendJsonBytes, serverHeader);
-        return messagePacket;
-    }
+//    private MessagePacket implementCloseMessagePacket(int clientRecieveMessageNum) throws JsonProcessingException {
+//        byte[] sendJsonBytes = implementCloseBody(this.name, threadLocalClientSendMessageNum.get(),
+//            clientRecieveMessageNum);
+//        byte[] serverHeader = implementCloseHeader(sendJsonBytes);
+//        MessagePacket messagePacket = new MessagePacket(sendJsonBytes, serverHeader);
+//        return messagePacket;
+//    }
 
     private static byte[] implementCloseBody(String name, int sendNum, int recieveNum) throws JsonProcessingException {
         CloseMessageBodyDto closeMessageBodyDto = new CloseMessageBodyDto();
