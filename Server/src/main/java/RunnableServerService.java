@@ -95,14 +95,6 @@ public class RunnableServerService {
         return headerConverter.bytesHeader;
     }
 
-//    public MessagePacket implementCloseMessagePacket(int clientRecieveMessageNum) throws JsonProcessingException {
-//        byte[] sendJsonBytes = implementCloseBody(this.name, threadLocalClientSendMessageNum.get(),
-//            clientRecieveMessageNum);
-//        byte[] serverHeader = implementCloseHeader(sendJsonBytes);
-//        MessagePacket messagePacket = new MessagePacket(sendJsonBytes, serverHeader);
-//        return messagePacket;
-//    }
-
     public void broadcastAllUser(HashMap<Socket, Integer> clients, Socket sock, MessagePacket messagePacket
         , ReentrantLock lockForClientsConcurrency) throws IOException {
         byte[] serverHeader = messagePacket.serverHeader;
@@ -130,8 +122,17 @@ public class RunnableServerService {
         }
     }
 
-
-
-
-
+//    public Type checkMessageType(byte[] serverHeader) {
+//        HeaderConverter headerConverter = new HeaderConverter();
+//        headerConverter.decodeHeader(serverHeader);
+//        int type = headerConverter.messageType;
+//        if (type == Type.MESSAGETOCLIENT.getValue()) {
+//            return Type.MESSAGETOCLIENT;
+//        } else if (type == Type.IMAGETOCLIENT.getValue()) {
+//            return Type.IMAGETOCLIENT;
+//        } else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
+//            return Type.CLIENTCLOSEMESSAGE;
+//        }
+//        return null;
+//    }
 }
