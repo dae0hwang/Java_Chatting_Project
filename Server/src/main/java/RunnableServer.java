@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.Socket;
@@ -52,6 +51,7 @@ public class RunnableServer implements Runnable {
                 byte[] header = serverService.recieveMessageHeaderFromClient(dataInputStream);
                 byte[] messageBodyBytes = serverService.receiveMessageBodyFromClient(dataInputStream, header);
                 Type messageType = serverService.readType(header);
+                Type serverMessageType;
                 switch (messageType) {
                     case RESISTERNAME:
                         this.name = serverService.resisterName(messageBodyBytes);
@@ -62,9 +62,10 @@ public class RunnableServer implements Runnable {
                             = serverService.implementStringMessageJsonBytes(messageBodyBytes, this.name);
                         byte[] stringMessageServerHeader
                             = serverService.implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
-                        MessagePacket stringMessagePacket =
-                            new MessagePacket(stringMessageJsonBytes, stringMessageServerHeader);
-                        serverService.broadcastAllUser(clients, sock, stringMessagePacket,lockForClientsConcurrency);
+                        serverMessageType = serverService.checkMessageType(stringMessageServerHeader);
+                        serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
+                        serverService.broadcastAllUser(serverMessageType, clients, sock, stringMessageJsonBytes
+                            , stringMessageServerHeader, lockForClientsConcurrency);
                         break;
                     case IMAGETOSERVER:
                         threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
@@ -72,9 +73,10 @@ public class RunnableServer implements Runnable {
                             = serverService.implementImageMessageJsonBytes(messageBodyBytes,this.name);
                         byte[] imageMessageServerHeader =
                             serverService.implementImageMessageServerHeaderBytes(imageMessageJsonBytes);
-                        MessagePacket ImagemssagePacket =
-                            new MessagePacket(imageMessageJsonBytes, imageMessageServerHeader);
-                        serverService.broadcastAllUser(clients, sock, ImagemssagePacket, lockForClientsConcurrency);
+                        serverMessageType = serverService.checkMessageType(imageMessageServerHeader);
+                        serverService.broadcastAllUser(serverMessageType, clients, sock, imageMessageJsonBytes
+                            , imageMessageServerHeader, lockForClientsConcurrency);
+                        serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
                         break;
                 }
             }
@@ -89,8 +91,10 @@ public class RunnableServer implements Runnable {
                     = serverService.implementCloseBody
                     (this.name, threadLocalClientSendMessageNum.get(), clientRecieveMessageNum);
                 byte[] closeMessageServerHeader = serverService.implementCloseHeader(closeMessageJsonBytes);
-                MessagePacket closeMessagePacket = new MessagePacket(closeMessageJsonBytes, closeMessageServerHeader);
-                serverService.broadcastAllUser(clients, sock, closeMessagePacket,lockForClientsConcurrency);
+                Type serverMessageType = serverService.checkMessageType(closeMessageServerHeader);
+                serverService.broadcastAllUser(serverMessageType, clients, sock, closeMessageJsonBytes
+                    , closeMessageServerHeader, lockForClientsConcurrency);
+                serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
             } catch (IOException ex) {
             }
         }

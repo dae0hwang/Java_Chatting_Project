@@ -95,26 +95,47 @@ public class RunnableServerService {
         return headerConverter.bytesHeader;
     }
 
-    public void broadcastAllUser(HashMap<Socket, Integer> clients, Socket sock, MessagePacket messagePacket
-        , ReentrantLock lockForClientsConcurrency) throws IOException {
-        byte[] serverHeader = messagePacket.serverHeader;
-        byte[] sendJsonBytes = messagePacket.sendJsonBytes;
+    public Type checkMessageType(byte[] serverHeader) {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.decodeHeader(serverHeader);
         int type = headerConverter.messageType;
-        if (type == Type.MESSAGETOCLIENT.getValue() || type == Type.IMAGETOCLIENT.getValue()
-            || type == Type.CLIENTCLOSEMESSAGE.getValue()) {
+        if (type == Type.MESSAGETOCLIENT.getValue()) {
+            return Type.MESSAGETOCLIENT;
+        } else if (type == Type.IMAGETOCLIENT.getValue()) {
+            return Type.IMAGETOCLIENT;
+        } else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
+            return Type.CLIENTCLOSEMESSAGE;
+        }
+        return null;
+    }
+
+    public void broadcastAllUser(Type messageType, HashMap<Socket, Integer> clients
+        , Socket socket, byte[] sendJsonBytes,byte[] serverHeader , ReentrantLock lockForClientsConcurrency)
+    throws IOException{
+        if (messageType == Type.MESSAGETOCLIENT || messageType == Type.CLIENTCLOSEMESSAGE) {
+            lockForClientsConcurrency.lock();
+
+            try {
+                for (Socket client : clients.keySet()) {
+                    DataOutputStream dataOutputStream = new DataOutputStream(client.getOutputStream());
+                    dataOutputStream.write(serverHeader, 0, serverHeader.length);
+                    dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+                    dataOutputStream.flush();
+                }
+            }finally {
+                lockForClientsConcurrency.unlock();
+            }
+        } else if (messageType == Type.IMAGETOCLIENT) {
             lockForClientsConcurrency.lock();
             try {
-                for (Socket clinet : clients.keySet()) {
-                    if (type == Type.IMAGETOCLIENT.getValue() && clinet == sock) {
+                for (Socket client : clients.keySet()) {
+                    if (client == socket) {
                         continue;
                     }
-                    RunnableServer.clientReceiveMessageNumPlus1(clinet);
-                    DataOutputStream dos = new DataOutputStream(clinet.getOutputStream());
-                    dos.write(serverHeader, 0, serverHeader.length);
-                    dos.write(sendJsonBytes, 0, sendJsonBytes.length);
-                    dos.flush();
+                    DataOutputStream dataOutputStream = new DataOutputStream(client.getOutputStream());
+                    dataOutputStream.write(serverHeader, 0, serverHeader.length);
+                    dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+                    dataOutputStream.flush();
                 }
             }finally {
                 lockForClientsConcurrency.unlock();
@@ -122,17 +143,29 @@ public class RunnableServerService {
         }
     }
 
-//    public Type checkMessageType(byte[] serverHeader) {
-//        HeaderConverter headerConverter = new HeaderConverter();
-//        headerConverter.decodeHeader(serverHeader);
-//        int type = headerConverter.messageType;
-//        if (type == Type.MESSAGETOCLIENT.getValue()) {
-//            return Type.MESSAGETOCLIENT;
-//        } else if (type == Type.IMAGETOCLIENT.getValue()) {
-//            return Type.IMAGETOCLIENT;
-//        } else if (type == Type.CLIENTCLOSEMESSAGE.getValue()) {
-//            return Type.CLIENTCLOSEMESSAGE;
-//        }
-//        return null;
-//    }
+    public void treatReceiveNumPlus(Type messageType, HashMap<Socket, Integer> clients
+        , Socket socket, ReentrantLock lockForClientsConcurrency) {
+        if (messageType == Type.MESSAGETOCLIENT || messageType == Type.CLIENTCLOSEMESSAGE) {
+            lockForClientsConcurrency.lock();
+            try {
+                for (Socket client : clients.keySet()) {
+                    RunnableServer.clientReceiveMessageNumPlus1(client);
+                }
+            }finally {
+                lockForClientsConcurrency.unlock();
+            }
+        } else if (messageType == Type.IMAGETOCLIENT) {
+            lockForClientsConcurrency.lock();
+            try {
+                for (Socket clinet : clients.keySet()) {
+                    if (clinet == socket) {
+                        continue;
+                    }
+                    RunnableServer.clientReceiveMessageNumPlus1(clinet);
+                }
+            }finally {
+                lockForClientsConcurrency.unlock();
+            }
+        }
+    }
 }

@@ -8,7 +8,7 @@ public class Client {
     public static void main(String[] args) {
         Socket sock = null;
         try {
-            sock = new Socket("192.168.219.190", 5510);
+            sock = new Socket("127.0.0.1", 5510);
             //receive message Thread start
             ServerHandler handler = new ServerHandler(sock);
             Thread receiveThread = new Thread(handler);
