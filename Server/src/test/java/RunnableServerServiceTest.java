@@ -33,8 +33,6 @@ class RunnableServerServiceTest {
         headerConverter = new HeaderConverter();
     }
 
-
-
     @Test
     void recieveMessageHeaderFromClient() throws IOException {
         //given
@@ -326,5 +324,4 @@ class RunnableServerServiceTest {
         assertEquals(RunnableServer.clients.get(socket2), 3);
         assertEquals(RunnableServer.clients.get(socket3), 3);
     }
-
 }
