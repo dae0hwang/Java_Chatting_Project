@@ -9,12 +9,34 @@ import java.nio.file.Paths;
 public class ServerHandlerService {
     ObjectMapper objectMapper = new ObjectMapper();
 
-   public HeaderInformation recieveMessageHeader(DataInputStream dataInputStream) throws IOException {
-        int messageHeaderSize = 8;
-        byte[] inputMessageHeader = new byte[messageHeaderSize];
-        dataInputStream.readFully(inputMessageHeader,0, messageHeaderSize);
+//   public HeaderInformation recieveMessageHeader(DataInputStream dataInputStream) throws IOException {
+//        int messageHeaderSize = 8;
+//        byte[] inputMessageHeader = new byte[messageHeaderSize];
+//        dataInputStream.readFully(inputMessageHeader,0, messageHeaderSize);
+//        HeaderConverter headerConverter = new HeaderConverter();
+//        headerConverter.decodeHeader(inputMessageHeader);
+//        Type type;
+//        if (headerConverter.messageType == Type.MESSAGETOCLIENT.getValue()) {
+//            type = Type.MESSAGETOCLIENT;
+//        } else if (headerConverter.messageType == Type.IMAGETOCLIENT.getValue()) {
+//            type = Type.IMAGETOCLIENT;
+//        } else {
+//            type = Type.CLIENTCLOSEMESSAGE;
+//        }
+//        HeaderInformation headerInformation = new HeaderInformation(headerConverter.messageLength, type);
+//        return headerInformation;
+//    }
+
+    public byte[] recieveMessageHeader(DataInputStream dataInputStream) throws IOException {
+        byte[] header = new byte[8];
+        dataInputStream.readFully(header, 0, header.length);
+        return header;
+    }
+
+
+    public HeaderInformation implementHeaderInformation(byte[] headerBytes) {
         HeaderConverter headerConverter = new HeaderConverter();
-        headerConverter.decodeHeader(inputMessageHeader);
+        headerConverter.decodeHeader(headerBytes);
         Type type;
         if (headerConverter.messageType == Type.MESSAGETOCLIENT.getValue()) {
             type = Type.MESSAGETOCLIENT;

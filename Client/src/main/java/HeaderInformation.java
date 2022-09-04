@@ -1,3 +1,6 @@
+import lombok.Data;
+
+@Data
 public class HeaderInformation {
     int messageBodyLength;
     Type messageBodyType;

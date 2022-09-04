@@ -20,7 +20,10 @@ class ServerHandler implements Runnable {
                 fromServer = sock.getInputStream();
                 dataInputStream = new DataInputStream(fromServer);
 
-                HeaderInformation headerInformation = serverHandlerService.recieveMessageHeader(dataInputStream);
+//                HeaderInformation headerInformation = serverHandlerService.recieveMessageHeader(dataInputStream);
+                byte[] inputMessageHeader = serverHandlerService.recieveMessageHeader(dataInputStream);
+                HeaderInformation headerInformation
+                    = serverHandlerService.implementHeaderInformation(inputMessageHeader);
                 int messageBodyLength = headerInformation.messageBodyLength;
                 Type messageBodyType = headerInformation.messageBodyType;
                 byte[] receiveMessageBodyBytes
