@@ -112,7 +112,9 @@ class RunnableServerServiceTest {
     @Test
     void resisterName() throws IOException {
         //given
-        byte[] messageBody = {123, 34, 110, 97, 109, 101, 34, 58, 34, 110, 97, 109, 101, 34, 125};
+        ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
+        resisterNameMessageBodyDto.setName("name");
+        byte[] messageBody = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
         String reuslt = "name";
 
         //when
@@ -121,21 +123,6 @@ class RunnableServerServiceTest {
         //then
         assertEquals(expectedName, reuslt);
     }
-
-//    @Test
-//    void resisterName() throws IOException {
-//        //given
-//        ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
-//        resisterNameMessageBodyDto.setName("name");
-//        byte[] messageBody = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
-//        String reuslt = "name";
-//
-//        //when
-//        String expectedName = serverService.resisterName(messageBody);
-//
-//        //then
-//        assertEquals(expectedName, reuslt);
-//    }
 
     @Test
     void implementStringMessageJsonBytes() throws IOException {
