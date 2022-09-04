@@ -114,7 +114,6 @@ public class RunnableServerService {
     throws IOException{
         if (messageType == Type.MESSAGETOCLIENT || messageType == Type.CLIENTCLOSEMESSAGE) {
             lockForClientsConcurrency.lock();
-
             try {
                 for (Socket client : clients.keySet()) {
                     DataOutputStream dataOutputStream = new DataOutputStream(client.getOutputStream());

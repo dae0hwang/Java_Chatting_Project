@@ -7,7 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +18,7 @@ class RunnableServerServiceTest {
 
     ObjectMapper objectMapper;
     RunnableServerService serverService;
-    //    DataOutputStream dataOutputStream;
+    DataOutputStream dataOutputStream;
     DataInputStream dataInputStream;
     Socket socket;
     HeaderConverter headerConverter;
@@ -27,7 +27,7 @@ class RunnableServerServiceTest {
     void init() {
         objectMapper = new ObjectMapper();
         serverService = new RunnableServerService();
-//        dataOutputStream = mock(DataOutputStream.class);
+        dataOutputStream = mock(DataOutputStream.class);
         dataInputStream = mock(DataInputStream.class);
         socket = mock(Socket.class);
         headerConverter = new HeaderConverter();
@@ -230,7 +230,114 @@ class RunnableServerServiceTest {
     }
 
     @Test
-    void broadcastAllUser() {
+    void checkMessageType() {
+        //given
+        byte[] serverHeader1 = {0, 0, 0, 0, 0, 0, 13, 5};
+        byte[] serverHeader2 = {0, 0, 0, 0, 0, 0, 26, 10};
+        byte[] serverHeader3 = {0, 0, 0, 0, 0, 0, 17, 92};
+        byte[] serverHeader4 = {0, 0, 0, 0, 0, 0, 21, -77};
+
+        Type result1 = Type.MESSAGETOCLIENT;
+        Type result2 = Type.IMAGETOCLIENT;
+        Type result3 = Type.CLIENTCLOSEMESSAGE;
+        Type result4 = null;
+
+        //when1
+        Type expectedType1 = serverService.checkMessageType(serverHeader1);
+        //then1
+        assertEquals(expectedType1, result1);
+
+        //when1
+        Type expectedType2 = serverService.checkMessageType(serverHeader2);
+        //then1
+        assertEquals(expectedType2, result2);
+
+        //when1
+        Type expectedType3 = serverService.checkMessageType(serverHeader3);
+        //then1
+        assertEquals(expectedType3, result3);
+
+        //when1
+        Type expectedType4 = serverService.checkMessageType(serverHeader4);
+        //then1
+        assertEquals(expectedType4, result4);
 
     }
+
+//    @Test
+//    void broadcastAllUser() throws IOException {
+//        //given
+//        ReentrantLock lock = new ReentrantLock();
+//        HashMap<Socket, Integer> clients = new HashMap<>();
+//        Socket socket1 = mock(Socket.class);
+//        Socket socket2 = mock(Socket.class);
+//        Socket socket3 = mock(Socket.class);
+//        clients.put(socket1, 0);
+//        clients.put(socket2, 0);
+//        clients.put(socket3, 0);
+//        byte[] sendJsonBytes = {0, 1, 2, 3, 4, 5, 6, 7};
+//        byte[] serverHeader = {0, 1, 2, 3, 4, 5, 6, 7};
+////        doAnswer(mockData -> {
+////            System.arraycopy(header, 0, mockData.getArguments()[0], 0, 8);
+////            return null;
+////        }).when(dataInputStream).readFully(any(byte[].class), eq(0), eq(8));
+////        dataOutputStream.write(serverHeader, 0, serverHeader.length);
+////        doAnswer().when(dataOutputStream).write();
+//
+//
+//
+//        //when1
+//        serverService.broadcastAllUser(Type.MESSAGETOCLIENT, clients, socket1, sendJsonBytes, serverHeader, lock);
+//
+//        //given1
+//        verify(dataOutputStream,times(1)).write(serverHeader, 0, serverHeader.length);
+//        verify(dataOutputStream,times(1)).write(sendJsonBytes, 0, sendJsonBytes.length);
+//        verify(dataOutputStream,times(1)).flush();
+//
+//    }
+
+    @Test
+    void treatReceiveNumPlus() {
+        //given
+        ReentrantLock lock = new ReentrantLock();
+        Socket socket1 = mock(Socket.class);
+        Socket socket2 = mock(Socket.class);
+        Socket socket3 = mock(Socket.class);
+        RunnableServer.addClientAndSetRecieveNumInClients(socket1);
+        RunnableServer.addClientAndSetRecieveNumInClients(socket2);
+        RunnableServer.addClientAndSetRecieveNumInClients(socket3);
+
+        //when1
+        serverService.treatReceiveNumPlus(Type.MESSAGETOCLIENT, RunnableServer.clients, socket1, lock);
+
+        //then1
+        assertEquals(RunnableServer.clients.get(socket1), 1);
+        assertEquals(RunnableServer.clients.get(socket2), 1);
+        assertEquals(RunnableServer.clients.get(socket3), 1);
+
+        //when2
+        serverService.treatReceiveNumPlus(Type.CLIENTCLOSEMESSAGE, RunnableServer.clients, socket1, lock);
+
+        //then2
+        assertEquals(RunnableServer.clients.get(socket1), 2);
+        assertEquals(RunnableServer.clients.get(socket2), 2);
+        assertEquals(RunnableServer.clients.get(socket3), 2);
+
+        //when3
+        serverService.treatReceiveNumPlus(Type.IMAGETOCLIENT, RunnableServer.clients, socket1, lock);
+
+        //then3
+        assertEquals(RunnableServer.clients.get(socket1), 2);
+        assertEquals(RunnableServer.clients.get(socket2), 3);
+        assertEquals(RunnableServer.clients.get(socket3), 3);
+
+        //when3
+        serverService.treatReceiveNumPlus(Type.IMAGETOSERVER, RunnableServer.clients, socket1, lock);
+
+        //then3
+        assertEquals(RunnableServer.clients.get(socket1), 2);
+        assertEquals(RunnableServer.clients.get(socket2), 3);
+        assertEquals(RunnableServer.clients.get(socket3), 3);
+    }
+
 }

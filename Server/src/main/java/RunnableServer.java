@@ -8,9 +8,9 @@ public class RunnableServer implements Runnable {
     protected Socket sock;
     private String name = null;
     private static ObjectMapper objectMapper = new ObjectMapper();
-    private static HashMap<Socket, Integer> clients = new HashMap<>();
+    protected static HashMap<Socket, Integer> clients = new HashMap<>();
     private static ReentrantLock lockForClientsConcurrency = new ReentrantLock();
-    protected static void removeClientInClients(Socket socket) {
+    public static void removeClientInClients(Socket socket) {
         lockForClientsConcurrency.lock();
         try {
             clients.remove(socket);
@@ -18,7 +18,7 @@ public class RunnableServer implements Runnable {
             lockForClientsConcurrency.unlock();
         }
     }
-    protected static void addClientAndSetRecieveNumInClients(Socket socket) {
+    public static void addClientAndSetRecieveNumInClients(Socket socket) {
         lockForClientsConcurrency.lock();
         int initialRecieveNum = 0;
         try {
@@ -29,7 +29,7 @@ public class RunnableServer implements Runnable {
         }
     }
     private ThreadLocal<Integer> threadLocalClientSendMessageNum = new ThreadLocal<>();
-    protected static  void clientReceiveMessageNumPlus1(Socket socket) {
+    public static  void clientReceiveMessageNumPlus1(Socket socket) {
         clients.put(socket, clients.getOrDefault(socket, 0) + 1);
     }
 
