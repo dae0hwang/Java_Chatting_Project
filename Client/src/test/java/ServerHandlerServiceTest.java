@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Socket;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,11 +20,18 @@ class ServerHandlerServiceTest {
     Socket socket;
     ServerHandlerService serverHandlerService;
 
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    ObjectMapper objectMapper;
+
     @BeforeEach
     void init() {
+        objectMapper = new ObjectMapper();
         dataInputStream = mock(DataInputStream.class);
         socket = mock(Socket.class);
         serverHandlerService = new ServerHandlerService();
+
+        System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @Test
@@ -91,25 +100,40 @@ class ServerHandlerServiceTest {
     @Test
     void printNameAndMessage() throws IOException {
         //given
-        ObjectMapper objectMapper = new ObjectMapper();
         StringMessageBodyDto stringMessageBodyDto = new StringMessageBodyDto();
         stringMessageBodyDto.setName("name");
         String message = "message";
         stringMessageBodyDto.setStringMessageBytes(message.getBytes("UTF-8"));
         byte[] messageBodyBytes = objectMapper.writeValueAsBytes(stringMessageBodyDto);
+        String printResult = "name: message\n";
 
         //when
         serverHandlerService.printNameAndMessage(messageBodyBytes);
 
         //then
+        assertEquals(outputStreamCaptor.toString(), printResult);
 
     }
 
     @Test
-    void printCloseMessage() {
+    void printCloseMessage() throws IOException {
+        //given
+        CloseMessageBodyDto closeMessageBodyDto = new CloseMessageBodyDto();
+        closeMessageBodyDto.setName("name");
+        closeMessageBodyDto.setSendNum(5);
+        closeMessageBodyDto.setRecieveNum(10);
+        byte[] closeMessageBytes = objectMapper.writeValueAsBytes(closeMessageBodyDto);
+        String printResult = "name is out || Number of sendMessageNum: 5, Number of recieveMessageNum : 10\n";
+
+        //when
+        serverHandlerService.printCloseMessage(closeMessageBytes);
+
+        //then
+        assertEquals(outputStreamCaptor.toString(), printResult);
     }
 
     @Test
     void saveAndOpenImageFile() {
+
     }
 }

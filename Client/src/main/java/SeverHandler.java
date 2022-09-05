@@ -36,7 +36,9 @@ class ServerHandler implements Runnable {
                         serverHandlerService.printCloseMessage(receiveMessageBodyBytes);
                         break;
                     case IMAGETOCLIENT:
-                        serverHandlerService.saveAndOpenImageFile(receiveMessageBodyBytes);
+                        String fileName = serverHandlerService.saveImageFile(receiveMessageBodyBytes);
+                        serverHandlerService.openImageFile(fileName);
+//                        serverHandlerService.saveAndOpenImageFile(receiveMessageBodyBytes);
                         break;
                 }
             }

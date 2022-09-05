@@ -129,9 +129,6 @@ class RunnableServerServiceTest {
         String str = "hi";
         stringMessageBodyDto.setStringMessageBytes(str.getBytes());
         byte[] stringMessageBytes = objectMapper.writeValueAsBytes(stringMessageBodyDto);
-//        byte[] stringMessageBytes = {123, 34, 110, 97, 109, 101, 34, 58, 110, 117, 108, 108, 44, 34, 115, 116, 114,
-//            105, 110, 103, 77, 101, 115, 115, 97, 103, 101, 66, 121, 116, 101, 115, 34, 58, 34, 97, 71, 107, 61, 34,
-//            125};
         stringMessageBodyDto.setName("name");
         byte[] result = objectMapper.writeValueAsBytes(stringMessageBodyDto);
 

@@ -5,11 +5,18 @@ import java.net.Socket;
 import java.nio.file.Files;
 
 public class ClientService {
-    ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private Socket socket;
+    protected DataOutputStream dataOutputStream;
 
-    public void sendResisterName(Socket socket) throws IOException {
-        OutputStream toServer = socket.getOutputStream();
-        DataOutputStream dos = new DataOutputStream(toServer);
+    ClientService(Socket socket) throws IOException {
+        this.socket = socket;
+        this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+    }
+
+    public void sendResisterName(DataOutputStream dataOutputStream) throws IOException {
+//        OutputStream toServer = socket.getOutputStream();
+//        DataOutputStream dos = new DataOutputStream(toServer);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String name = br.readLine();
         ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
@@ -19,9 +26,9 @@ public class ClientService {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length,type);
         byte[] clientHeader = headerConverter.bytesHeader;
-        dos.write(clientHeader,0,clientHeader.length);
-        dos.write(sendJsonBytes, 0, sendJsonBytes.length);
-        dos.flush();
+        dataOutputStream.write(clientHeader,0,clientHeader.length);
+        dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+        dataOutputStream.flush();
     }
 
     public InputStringAndType storeInputStringAndSetType() throws IOException {
@@ -37,7 +44,7 @@ public class ClientService {
         return inputStringAndType;
     }
 
-    public void sendStringMessage(Socket socket, InputStringAndType inputStringAndType)
+    public void sendStringMessage(DataOutputStream dataOutputStream, InputStringAndType inputStringAndType)
         throws IOException {
         byte[] inputStringtobytes = inputStringAndType.inputString.getBytes("UTF-8");
         StringMessageBodyDto stringMessageBodyDto = new StringMessageBodyDto();
@@ -46,14 +53,14 @@ public class ClientService {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
         byte[] header = headerConverter.bytesHeader;
-        OutputStream toServer = socket.getOutputStream();
-        DataOutputStream dos = new DataOutputStream(toServer);
-        dos.write(header, 0, header.length);
-        dos.write(sendJsonBytes, 0, sendJsonBytes.length);
-        dos.flush();
+//        OutputStream toServer = socket.getOutputStream();
+//        DataOutputStream dos = new DataOutputStream(toServer);
+        dataOutputStream.write(header, 0, header.length);
+        dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+        dataOutputStream.flush();
     }
 
-    public void sendImageMessage(Socket socket, InputStringAndType inputStringAndType)
+    public void sendImageMessage(DataOutputStream dataOutputStream, InputStringAndType inputStringAndType)
         throws IOException {
         int filePathStartIdx = 8;
         String inputString = inputStringAndType.inputString;
@@ -66,10 +73,10 @@ public class ClientService {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
         byte[] header = headerConverter.bytesHeader;
-        OutputStream toServer = socket.getOutputStream();
-        DataOutputStream dos = new DataOutputStream(toServer);
-        dos.write(header, 0, header.length);
-        dos.write(sendJsonBytes, 0, sendJsonBytes.length);
-        dos.flush();
+//        OutputStream toServer = socket.getOutputStream();
+//        DataOutputStream dos = new DataOutputStream(toServer);
+        dataOutputStream.write(header, 0, header.length);
+        dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+        dataOutputStream.flush();
     }
 }
