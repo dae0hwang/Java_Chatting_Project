@@ -20,7 +20,6 @@ class ServerHandler implements Runnable {
                 fromServer = sock.getInputStream();
                 dataInputStream = new DataInputStream(fromServer);
 
-//                HeaderInformation headerInformation = serverHandlerService.recieveMessageHeader(dataInputStream);
                 byte[] inputMessageHeader = serverHandlerService.recieveMessageHeader(dataInputStream);
                 HeaderInformation headerInformation
                     = serverHandlerService.implementHeaderInformation(inputMessageHeader);
@@ -36,9 +35,13 @@ class ServerHandler implements Runnable {
                         serverHandlerService.printCloseMessage(receiveMessageBodyBytes);
                         break;
                     case IMAGETOCLIENT:
-                        String fileName = serverHandlerService.saveImageFile(receiveMessageBodyBytes);
+//                        String fileName = serverHandlerService.saveImageFile(receiveMessageBodyBytes);
+//                        serverHandlerService.openImageFile(fileName);
+                        ImageBytesAndDirectory imageBytesAndDirectory
+                            = serverHandlerService.saveImageInformation(sock, receiveMessageBodyBytes);
+                        serverHandlerService.makeImageFile(imageBytesAndDirectory);
+                        String fileName = serverHandlerService.returnFileName(imageBytesAndDirectory);
                         serverHandlerService.openImageFile(fileName);
-//                        serverHandlerService.saveAndOpenImageFile(receiveMessageBodyBytes);
                         break;
                 }
             }

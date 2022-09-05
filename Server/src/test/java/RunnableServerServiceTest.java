@@ -1,12 +1,14 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -245,38 +247,31 @@ class RunnableServerServiceTest {
         assertEquals(expectedType4, result4);
 
     }
+    @Disabled
+    @Test
+    void broadcastAllUser() throws IOException {
+        //given
+        ReentrantLock lock = new ReentrantLock();
+        HashMap<Socket, Integer> clients = new HashMap<>();
+        Socket socket1 = mock(Socket.class);
+        Socket socket2 = mock(Socket.class);
+        Socket socket3 = mock(Socket.class);
+        clients.put(socket1, 0);
+        clients.put(socket2, 0);
+        clients.put(socket3, 0);
+        byte[] sendJsonBytes = {0, 1, 2, 3, 4, 5, 6, 7};
+        byte[] serverHeader = {0, 1, 2, 3, 4, 5, 6, 7};
 
-//    @Test
-//    void broadcastAllUser() throws IOException {
-//        //given
-//        ReentrantLock lock = new ReentrantLock();
-//        HashMap<Socket, Integer> clients = new HashMap<>();
-//        Socket socket1 = mock(Socket.class);
-//        Socket socket2 = mock(Socket.class);
-//        Socket socket3 = mock(Socket.class);
-//        clients.put(socket1, 0);
-//        clients.put(socket2, 0);
-//        clients.put(socket3, 0);
-//        byte[] sendJsonBytes = {0, 1, 2, 3, 4, 5, 6, 7};
-//        byte[] serverHeader = {0, 1, 2, 3, 4, 5, 6, 7};
-////        doAnswer(mockData -> {
-////            System.arraycopy(header, 0, mockData.getArguments()[0], 0, 8);
-////            return null;
-////        }).when(dataInputStream).readFully(any(byte[].class), eq(0), eq(8));
-////        dataOutputStream.write(serverHeader, 0, serverHeader.length);
-////        doAnswer().when(dataOutputStream).write();
-//
-//
-//
-//        //when1
-//        serverService.broadcastAllUser(Type.MESSAGETOCLIENT, clients, socket1, sendJsonBytes, serverHeader, lock);
-//
-//        //given1
-//        verify(dataOutputStream,times(1)).write(serverHeader, 0, serverHeader.length);
-//        verify(dataOutputStream,times(1)).write(sendJsonBytes, 0, sendJsonBytes.length);
-//        verify(dataOutputStream,times(1)).flush();
-//
-//    }
+
+        //when1
+        serverService.broadcastAllUser(Type.MESSAGETOCLIENT, clients, socket1, sendJsonBytes, serverHeader, lock);
+
+        //given1
+        verify(dataOutputStream,times(1)).write(serverHeader, 0, serverHeader.length);
+        verify(dataOutputStream,times(1)).write(sendJsonBytes, 0, sendJsonBytes.length);
+        verify(dataOutputStream,times(1)).flush();
+
+    }
 
     @Test
     void treatReceiveNumPlus() {

@@ -15,26 +15,8 @@ public class ClientService {
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
     }
 
-//    public void sendResisterName(DataOutputStream dataOutputStream) throws IOException {
-////        OutputStream toServer = socket.getOutputStream();
-////        DataOutputStream dos = new DataOutputStream(toServer);
-//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//        String name = br.readLine();
-//        ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
-//        resisterNameMessageBodyDto.setName(name);
-//        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
-//        int type = Type.RESISTERNAME.getValue();
-//        HeaderConverter headerConverter = new HeaderConverter();
-//        headerConverter.encodeHeader(sendJsonBytes.length,type);
-//        byte[] clientHeader = headerConverter.bytesHeader;
-//        dataOutputStream.write(clientHeader,0,clientHeader.length);
-//        dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
-//        dataOutputStream.flush();
-//    }
-
-    public byte[] implementResisterNameJsonBytes() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String name = br.readLine();
+    public byte[] implementResisterNameJsonBytes(BufferedReader bufferedReader) throws IOException {
+        String name = bufferedReader.readLine();
         ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
         resisterNameMessageBodyDto.setName(name);
         byte[] sendJsonBytes = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
@@ -57,9 +39,8 @@ public class ClientService {
         dataOutputStream.flush();
     }
 
-    public InputStringAndType storeInputStringAndSetType() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String inputString = br.readLine();
+    public InputStringAndType storeInputStringAndSetType(BufferedReader bufferedReader) throws IOException {
+        String inputString = bufferedReader.readLine();
         Type type;
         if (inputString.length() >= 8 && inputString.substring(0, 8).equals("image://")) {
             type = Type.IMAGETOSERVER;
@@ -79,8 +60,6 @@ public class ClientService {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
         byte[] header = headerConverter.bytesHeader;
-//        OutputStream toServer = socket.getOutputStream();
-//        DataOutputStream dos = new DataOutputStream(toServer);
         dataOutputStream.write(header, 0, header.length);
         dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
         dataOutputStream.flush();
@@ -99,8 +78,6 @@ public class ClientService {
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());
         byte[] header = headerConverter.bytesHeader;
-//        OutputStream toServer = socket.getOutputStream();
-//        DataOutputStream dos = new DataOutputStream(toServer);
         dataOutputStream.write(header, 0, header.length);
         dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
         dataOutputStream.flush();

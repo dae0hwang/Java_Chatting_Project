@@ -96,7 +96,6 @@ class ServerHandlerServiceTest {
         assertArrayEquals(expected, messageBodyBytes);
     }
 
-    @Disabled
     @Test
     void printNameAndMessage() throws IOException {
         //given

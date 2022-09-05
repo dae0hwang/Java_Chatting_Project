@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.net.Socket;
@@ -6,7 +7,7 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RunnableServerTest {
-
+    @Disabled
     @Test
     void removeClientInClients() {
         //given
