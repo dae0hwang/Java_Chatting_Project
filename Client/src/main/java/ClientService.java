@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
@@ -14,20 +15,45 @@ public class ClientService {
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
     }
 
-    public void sendResisterName(DataOutputStream dataOutputStream) throws IOException {
-//        OutputStream toServer = socket.getOutputStream();
-//        DataOutputStream dos = new DataOutputStream(toServer);
+//    public void sendResisterName(DataOutputStream dataOutputStream) throws IOException {
+////        OutputStream toServer = socket.getOutputStream();
+////        DataOutputStream dos = new DataOutputStream(toServer);
+//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        String name = br.readLine();
+//        ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
+//        resisterNameMessageBodyDto.setName(name);
+//        byte[] sendJsonBytes = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
+//        int type = Type.RESISTERNAME.getValue();
+//        HeaderConverter headerConverter = new HeaderConverter();
+//        headerConverter.encodeHeader(sendJsonBytes.length,type);
+//        byte[] clientHeader = headerConverter.bytesHeader;
+//        dataOutputStream.write(clientHeader,0,clientHeader.length);
+//        dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+//        dataOutputStream.flush();
+//    }
+
+    public byte[] implementResisterNameJsonBytes() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String name = br.readLine();
         ResisterNameMessageBodyDto resisterNameMessageBodyDto = new ResisterNameMessageBodyDto();
         resisterNameMessageBodyDto.setName(name);
         byte[] sendJsonBytes = objectMapper.writeValueAsBytes(resisterNameMessageBodyDto);
+        return sendJsonBytes;
+    }
+
+    public byte[] implementResisterNameHeader(byte[] sendJsonBytes) {
         int type = Type.RESISTERNAME.getValue();
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length,type);
         byte[] clientHeader = headerConverter.bytesHeader;
-        dataOutputStream.write(clientHeader,0,clientHeader.length);
-        dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
+        return clientHeader;
+    }
+
+    public void sendResisterName
+        (DataOutputStream dataOutputStream, byte[] resisterNameHeader, byte[] resisterNameJsonBytes)
+        throws IOException {
+        dataOutputStream.write(resisterNameHeader,0,resisterNameHeader.length);
+        dataOutputStream.write(resisterNameJsonBytes, 0, resisterNameJsonBytes.length);
         dataOutputStream.flush();
     }
 

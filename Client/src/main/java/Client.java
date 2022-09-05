@@ -15,7 +15,9 @@ public class Client {
             receiveThread.start();
             ClientService clientService = new ClientService(socket);
             System.out.print("Register your name: ");
-            clientService.sendResisterName(clientService.dataOutputStream);
+            byte[] resisterNameJsonBytes = clientService.implementResisterNameJsonBytes();
+            byte[] resisterNameHeader = clientService.implementResisterNameHeader(resisterNameJsonBytes);
+            clientService.sendResisterName(clientService.dataOutputStream, resisterNameHeader, resisterNameJsonBytes);
             while (true) {
                 InputStringAndType inputStringAndType = clientService.storeInputStringAndSetType();
                 Type type = inputStringAndType.type;

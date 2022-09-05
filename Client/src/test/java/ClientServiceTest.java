@@ -15,25 +15,26 @@ class ClientServiceTest {
     Socket socket;
     BufferedReader bufferedReader;
     ClientService clientService;
+    DataOutputStream dataOutputStream;
 
     @BeforeEach
     void init() throws IOException {
         socket = mock(Socket.class);
         bufferedReader = mock(BufferedReader.class);
         clientService = new ClientService(socket);
+        dataOutputStream = mock(DataOutputStream.class);
     }
 
 //    @Test
 //    void sendResisterName() throws IOException {
 //        //given
-//        DataOutputStream dataOutputStream = mock(DataOutputStream.class);
-//        when(socket.getOutputStream()).thenReturn(dataOutputStream);
+//        clientService.sendResisterName(dataOutputStream);
+//
 //        when(bufferedReader.readLine()).thenReturn("name");
 //        byte[] sendJsonBytes = {123, 34, 110, 97, 109, 101, 34, 58, 34, 110, 97, 109, 101, 34, 125};
 //        byte[] clientHeader = {0, 0, 0, 15, 0, 0, 4, 87};
 //
 //        //when
-//        clientService.sendResisterName(socket);
 //
 //        //then
 //        verify(dataOutputStream, times(1)).write(clientHeader, 0, clientHeader.length);
