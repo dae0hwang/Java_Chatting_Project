@@ -1,5 +1,7 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,10 +10,12 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+
 public class RunnableServerService {
     ObjectMapper objectMapper = new ObjectMapper();
+    DataOutputStreamFactory dataOutputStreamFactory = new DataOutputStreamFactory();
 
-    public  byte[] recieveMessageHeaderFromClient(DataInputStream dis) throws IOException {
+    public byte[] recieveMessageHeaderFromClient(DataInputStream dis) throws IOException {
         byte[] header = new byte[8];
         dis.readFully(header, 0, header.length);
         return header;
@@ -22,7 +26,7 @@ public class RunnableServerService {
         headerConverter.decodeHeader(header);
         int length = headerConverter.messageLength;
         byte[] receiveBytes = new byte[length];
-        dis.readFully(receiveBytes,0,length);
+        dis.readFully(receiveBytes, 0, length);
         System.out.println("server message received message header and body");
         return receiveBytes;
     }
@@ -87,7 +91,7 @@ public class RunnableServerService {
         return objectMapper.writeValueAsBytes(closeMessageBodyDto);
     }
 
-    public byte[] implementCloseHeader( byte[] sendJsonBytes) {
+    public byte[] implementCloseHeader(byte[] sendJsonBytes) {
         HeaderConverter headerConverter = new HeaderConverter();
         int serverLength = sendJsonBytes.length;
         int serverType = Type.CLIENTCLOSEMESSAGE.getValue();
@@ -110,18 +114,19 @@ public class RunnableServerService {
     }
 
     public void broadcastAllUser(Type messageType, HashMap<Socket, Integer> clients
-        , Socket socket, byte[] sendJsonBytes,byte[] serverHeader , ReentrantLock lockForClientsConcurrency)
-    throws IOException{
+        , DataOutputStreamFactory dataOutputStreamFactory, Socket socket
+        , byte[] sendJsonBytes, byte[] serverHeader, ReentrantLock lockForClientsConcurrency)
+        throws IOException {
         if (messageType == Type.MESSAGETOCLIENT || messageType == Type.CLIENTCLOSEMESSAGE) {
             lockForClientsConcurrency.lock();
             try {
                 for (Socket client : clients.keySet()) {
-                    DataOutputStream dataOutputStream = new DataOutputStream(client.getOutputStream());
+                    DataOutputStream dataOutputStream = dataOutputStreamFactory.createDataOutputStream(client);
                     dataOutputStream.write(serverHeader, 0, serverHeader.length);
                     dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
                     dataOutputStream.flush();
                 }
-            }finally {
+            } finally {
                 lockForClientsConcurrency.unlock();
             }
         } else if (messageType == Type.IMAGETOCLIENT) {
@@ -131,12 +136,12 @@ public class RunnableServerService {
                     if (client == socket) {
                         continue;
                     }
-                    DataOutputStream dataOutputStream = new DataOutputStream(client.getOutputStream());
+                    DataOutputStream dataOutputStream = dataOutputStreamFactory.createDataOutputStream(client);
                     dataOutputStream.write(serverHeader, 0, serverHeader.length);
                     dataOutputStream.write(sendJsonBytes, 0, sendJsonBytes.length);
                     dataOutputStream.flush();
                 }
-            }finally {
+            } finally {
                 lockForClientsConcurrency.unlock();
             }
         }
@@ -150,7 +155,7 @@ public class RunnableServerService {
                 for (Socket client : clients.keySet()) {
                     RunnableServer.clientReceiveMessageNumPlus1(client);
                 }
-            }finally {
+            } finally {
                 lockForClientsConcurrency.unlock();
             }
         } else if (messageType == Type.IMAGETOCLIENT) {
@@ -162,7 +167,7 @@ public class RunnableServerService {
                     }
                     RunnableServer.clientReceiveMessageNumPlus1(clinet);
                 }
-            }finally {
+            } finally {
                 lockForClientsConcurrency.unlock();
             }
         }

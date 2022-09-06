@@ -105,8 +105,6 @@ class RunnableServerServiceTest {
         Type expected4 = serverService.readType(header4);
         //then4
         assertEquals(expected4, result4);
-
-
     }
 
     @Test
@@ -247,11 +245,11 @@ class RunnableServerServiceTest {
         assertEquals(expectedType4, result4);
 
     }
-    @Disabled
+
     @Test
     void broadcastAllUser() throws IOException {
         //given
-        ReentrantLock lock = new ReentrantLock();
+        ReentrantLock lock = mock(ReentrantLock.class);
         HashMap<Socket, Integer> clients = new HashMap<>();
         Socket socket1 = mock(Socket.class);
         Socket socket2 = mock(Socket.class);
@@ -259,18 +257,40 @@ class RunnableServerServiceTest {
         clients.put(socket1, 0);
         clients.put(socket2, 0);
         clients.put(socket3, 0);
-        byte[] sendJsonBytes = {0, 1, 2, 3, 4, 5, 6, 7};
-        byte[] serverHeader = {0, 1, 2, 3, 4, 5, 6, 7};
+        DataOutputStreamFactory dataOutputStreamFactory = mock(DataOutputStreamFactory.class);
+        when(dataOutputStreamFactory.createDataOutputStream(any(Socket.class))).thenReturn(dataOutputStream);
+
+        byte[] sendJsonBytes1 = {1, 1, 1};
+        byte[] serverHeader1 = {2, 2, 2};
+        byte[] sendJsonBytes2 = {3, 3, 3};
+        byte[] serverHeader2 = {4, 4, 4};
+        byte[] sendJsonBytes3 = {5, 5, 5};
+        byte[] serverHeader3 = {6, 6, 6};
 
 
         //when1
-        serverService.broadcastAllUser(Type.MESSAGETOCLIENT, clients, socket1, sendJsonBytes, serverHeader, lock);
+        serverService.broadcastAllUser(Type.MESSAGETOCLIENT, clients, dataOutputStreamFactory
+            ,socket1, sendJsonBytes1, serverHeader1, lock);
+        //then1
+        verify(dataOutputStream,times(3)).write(serverHeader1, 0, serverHeader1.length);
+        verify(dataOutputStream,times(3)).write(sendJsonBytes1, 0, sendJsonBytes1.length);
+        verify(dataOutputStream,times(3)).flush();
 
-        //given1
-        verify(dataOutputStream,times(1)).write(serverHeader, 0, serverHeader.length);
-        verify(dataOutputStream,times(1)).write(sendJsonBytes, 0, sendJsonBytes.length);
-        verify(dataOutputStream,times(1)).flush();
+        //when2
+        serverService.broadcastAllUser(Type.CLIENTCLOSEMESSAGE, clients, dataOutputStreamFactory
+            ,socket1, sendJsonBytes2, serverHeader2, lock);
+        //then2
+        verify(dataOutputStream,times(3)).write(serverHeader2, 0, serverHeader2.length);
+        verify(dataOutputStream,times(3)).write(sendJsonBytes2, 0, sendJsonBytes2.length);
+        verify(dataOutputStream,times(6)).flush();
 
+        //when2
+        serverService.broadcastAllUser(Type.IMAGETOCLIENT, clients, dataOutputStreamFactory
+            ,socket1, sendJsonBytes3, serverHeader3, lock);
+        //then2
+        verify(dataOutputStream,times(2)).write(serverHeader3, 0, serverHeader3.length);
+        verify(dataOutputStream,times(2)).write(sendJsonBytes3, 0, sendJsonBytes3.length);
+        verify(dataOutputStream,times(8)).flush();
     }
 
     @Test

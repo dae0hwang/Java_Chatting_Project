@@ -43,6 +43,7 @@ public class RunnableServer implements Runnable {
         threadLocalClientSendMessageNum.set(0);
         InputStream fromClient;
         DataInputStream dataInputStream;
+        DataOutputStreamFactory dataOutputStreamFactory = new DataOutputStreamFactory();
         try {
             System.out.println(sock + ": is connected");
             while (true) {
@@ -64,8 +65,8 @@ public class RunnableServer implements Runnable {
                             = serverService.implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
                         serverMessageType = serverService.checkMessageType(stringMessageServerHeader);
                         serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
-                        serverService.broadcastAllUser(serverMessageType, clients, sock, stringMessageJsonBytes
-                            , stringMessageServerHeader, lockForClientsConcurrency);
+                        serverService.broadcastAllUser(serverMessageType, clients, dataOutputStreamFactory
+                            , sock, stringMessageJsonBytes, stringMessageServerHeader, lockForClientsConcurrency);
                         break;
                     case IMAGETOSERVER:
                         threadLocalClientSendMessageNum.set(threadLocalClientSendMessageNum.get()+1);
@@ -74,8 +75,8 @@ public class RunnableServer implements Runnable {
                         byte[] imageMessageServerHeader =
                             serverService.implementImageMessageServerHeaderBytes(imageMessageJsonBytes);
                         serverMessageType = serverService.checkMessageType(imageMessageServerHeader);
-                        serverService.broadcastAllUser(serverMessageType, clients, sock, imageMessageJsonBytes
-                            , imageMessageServerHeader, lockForClientsConcurrency);
+                        serverService.broadcastAllUser(serverMessageType, clients, dataOutputStreamFactory
+                            , sock, imageMessageJsonBytes, imageMessageServerHeader, lockForClientsConcurrency);
                         serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
                         break;
                 }
@@ -92,8 +93,8 @@ public class RunnableServer implements Runnable {
                     (this.name, threadLocalClientSendMessageNum.get(), clientRecieveMessageNum);
                 byte[] closeMessageServerHeader = serverService.implementCloseHeader(closeMessageJsonBytes);
                 Type serverMessageType = serverService.checkMessageType(closeMessageServerHeader);
-                serverService.broadcastAllUser(serverMessageType, clients, sock, closeMessageJsonBytes
-                    , closeMessageServerHeader, lockForClientsConcurrency);
+                serverService.broadcastAllUser(serverMessageType, clients, dataOutputStreamFactory,
+                    sock, closeMessageJsonBytes, closeMessageServerHeader, lockForClientsConcurrency);
                 serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
             } catch (IOException ex) {
             }

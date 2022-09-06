@@ -6,9 +6,8 @@ public class Client {
     private static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) {
         Socket socket = null;
-//        ClientService clientService = new ClientService();
         try {
-            socket = new Socket("127.0.0.1", 5510);
+            socket = new Socket("192.168.219.112", 5510);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             //receive message Thread start
             ServerHandler handler = new ServerHandler(socket);
