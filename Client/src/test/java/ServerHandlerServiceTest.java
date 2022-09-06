@@ -193,7 +193,7 @@ class ServerHandlerServiceTest {
 
     @Disabled
     @Test
-    void saveAndOpenImageFile(@TempDir Path tempDir) throws IOException {
+    void openImageFile(@TempDir Path tempDir) throws IOException {
         //given
         BufferedImage image = ImageIO.read(getClass().getResourceAsStream("sea.jpg"));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -205,9 +205,14 @@ class ServerHandlerServiceTest {
 
         String fileName = "C:\\Users\\geung\\Downloads\\22\\copy.jpg";
 
-        //when
-        serverHandlerService.openImageFile(fileName);
-
-        //then
+//        ProcessBuilderFactory processBuilderFactory= mock(ProcessBuilderFactory.class);
+//        ProcessBuilder processBuilder = mock(ProcessBuilder.class);
+//        when(processBuilderFactory.create(any(String.class))).thenReturn(processBuilder);
+//
+//        //when
+//        serverHandlerService.openImageFile(processBuilderFactory, fileName);
+//
+//        //then
+//        verify(processBuilder, times(1)).start();
     }
 }

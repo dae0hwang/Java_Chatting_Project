@@ -84,7 +84,7 @@ public class ServerHandlerService {
     }
 
 
-    public void openImageFile(String fileName) throws IOException {
+    public void openImageFile( String fileName) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(
             "C:\\Windows\\System32\\mspaint.exe"
             , fileName);

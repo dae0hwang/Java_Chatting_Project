@@ -4,12 +4,11 @@ import java.net.Socket;
 
 class ServerHandler implements Runnable {
     static Socket sock;
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public ServerHandler(Socket sock) {
         this.sock = sock;
     }
-
-    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public void run() {
         InputStream fromServer = null;
@@ -35,8 +34,6 @@ class ServerHandler implements Runnable {
                         serverHandlerService.printCloseMessage(receiveMessageBodyBytes);
                         break;
                     case IMAGETOCLIENT:
-//                        String fileName = serverHandlerService.saveImageFile(receiveMessageBodyBytes);
-//                        serverHandlerService.openImageFile(fileName);
                         ImageBytesAndDirectory imageBytesAndDirectory
                             = serverHandlerService.saveImageInformation(sock, receiveMessageBodyBytes);
                         serverHandlerService.makeImageFile(imageBytesAndDirectory);
