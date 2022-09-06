@@ -3,17 +3,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
 
 class ServerHandlerServiceTest {
     DataInputStream dataInputStream;
@@ -132,7 +135,83 @@ class ServerHandlerServiceTest {
     }
 
     @Test
-    void saveAndOpenImageFile() {
+    void saveImageInformation() throws IOException {
+        //given
+        ImageMessageBodyDto imageMessageBodyDto = new ImageMessageBodyDto();
+        byte[] imageBytes = {0, 1, 2, 3, 4, 5, 6, 7};
+        imageMessageBodyDto.setImageMessageBytes(imageBytes);
+        byte[] messageBodyBytes = objectMapper.writeValueAsBytes(imageMessageBodyDto);
+        when(socket.getLocalPort()).thenReturn(15);
+
+        ImageBytesAndDirectory result = new ImageBytesAndDirectory();
+        result.setDirectory("15");
+        result.setImageBytes(imageBytes);
+
+        //when
+        ImageBytesAndDirectory expected = serverHandlerService.saveImageInformation(socket, messageBodyBytes);
+
+        //then
+        assertEquals(expected, result);
+    }
+
+    @Disabled
+    @Test
+    void makeImageFile(@TempDir Path tempDir) throws IOException {
+        //given
+        ImageBytesAndDirectory imageBytesAndDirectory = new ImageBytesAndDirectory();
+        BufferedImage image = ImageIO.read(getClass().getResourceAsStream("sea.jpg"));
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", byteArrayOutputStream);
+        byteArrayOutputStream.flush();
+        byte[] imageInByte = byteArrayOutputStream.toByteArray();
+        imageBytesAndDirectory.setImageBytes(imageInByte);
+        imageBytesAndDirectory.setDirectory("15");
+
+        //when
+        serverHandlerService.makeImageFile(imageBytesAndDirectory);
+        byte[] expectedImageBytes = Files.readAllBytes(Path.of("C:\\Users\\geung\\Downloads\\15\\copy.jpg"));
+
+        //then
+        assertTrue(Files.exists(Path.of("C:\\Users\\geung\\Downloads\\15\\copy.jpg")));
+//        assertEquals(expectedImageBytes,imageInByte);
+    }
+
+    @Test
+    void returnFileName() throws IOException {
+        //given
+        ImageBytesAndDirectory imageBytesAndDirectory = new ImageBytesAndDirectory();
+        imageBytesAndDirectory.setDirectory("15");
+
+        String resultFileName = "C:\\Users\\geung\\Downloads" + "\\15\\copy.jpg";
+
+        //when
+        String expectedFileName = serverHandlerService.returnFileName(imageBytesAndDirectory);
+
+        //then
+        assertEquals(expectedFileName, resultFileName);
+    }
+
+    @Disabled
+    @Test
+    void saveAndOpenImageFile(@TempDir Path tempDir) throws IOException {
+        //given
+        BufferedImage image = ImageIO.read(getClass().getResourceAsStream("sea.jpg"));
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", byteArrayOutputStream);
+        byteArrayOutputStream.flush();
+        byte[] imageInByte = byteArrayOutputStream.toByteArray();
+        Path tempFile = tempDir.resolve("C:\\Users\\geung\\Downloads\\22\\copy.jpg");
+        Files.write(tempFile, imageInByte);
+
+        String fileName = "C:\\Users\\geung\\Downloads\\22\\copy.jpg";
+
+        //when
+        serverHandlerService.openImageFile(fileName);
+
+        //then
+
+
+
 
     }
 }

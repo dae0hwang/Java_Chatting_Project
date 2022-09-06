@@ -56,26 +56,6 @@ public class ServerHandlerService {
             + sendNum + ", Number of recieveMessageNum : "+ receiveNum+ "\n");
     }
 
-//    public String saveImageFile(byte[] messageBodyBytes) throws IOException {
-//        ImageMessageBodyDto imageMessageBodyDto =
-//            objectMapper.readValue(messageBodyBytes, ImageMessageBodyDto.class);
-//        byte[] imageBytes = imageMessageBodyDto.getImageMessageBytes();
-//        String directory = Integer.toString(ServerHandler.sock.getLocalPort());
-//        Path path = Paths.get("C:\\Users\\geung\\Downloads" + "\\" + directory);
-//        Files.createDirectories(path);
-//        String fileName = path.toString() + "\\copy.jpg";
-//        Files.write(Path.of(fileName), imageBytes);
-//        System.out.println("image download success. filename is " + fileName);
-//        return fileName;
-//    }
-    /*
-    테스트 하기 쉽게 어떻게 만들까
-    1. 이미지 바이트 디렉토리 받기.
-    2.정보를 가지고 디렉토리와 파일 만들기.
-
-
-     */
-    //낼 여기부터 코드바꾸고 테스트 코드 작성하면 되겠다.
     public ImageBytesAndDirectory saveImageInformation(Socket sockets, byte[] messageBodyBytes) throws IOException {
         ImageMessageBodyDto imageMessageBodyDto =
             objectMapper.readValue(messageBodyBytes, ImageMessageBodyDto.class);
@@ -94,11 +74,10 @@ public class ServerHandlerService {
         Files.createDirectories(path);
         String fileName = path.toString() + "\\copy.jpg";
         Files.write(Path.of(fileName), imageBytes);
-        System.out.println("image download success. filename is " + fileName);
     }
 
     public String returnFileName(ImageBytesAndDirectory imageBytesAndDirectory) throws IOException {
-        String directory = Integer.toString(ServerHandler.sock.getLocalPort());
+        String directory = imageBytesAndDirectory.getDirectory();
         Path path = Paths.get("C:\\Users\\geung\\Downloads" + "\\" + directory);
         String fileName = path.toString() + "\\copy.jpg";
         return fileName;
