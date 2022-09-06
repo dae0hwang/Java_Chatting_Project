@@ -1,11 +1,15 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
 import javax.xml.crypto.Data;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,18 +119,24 @@ class ClientServiceTest {
         verify(dataOutputStream, times(1)).flush();
     }
 
+    @Disabled
     @Test
     void sendImageMessage() throws IOException {
         //given
+        URL resource = getClass().getClassLoader().getResource("sea.jpg");
+        String filePath = resource.getFile();
+
         InputStringAndType inputStringAndType
-            = new InputStringAndType("image://C:\\Users\\geung\\Desktop\\sea.jpg", Type.IMAGETOSERVER);
-        int filePathStartIdx = 8;
-        String inputString = inputStringAndType.inputString;
-        String filePath = inputString.substring(filePathStartIdx, inputString.length());
-        File file = new File(filePath);
-        byte[] imageFileBytes = Files.readAllBytes(file.toPath());
+            = new InputStringAndType("image://" + filePath, Type.IMAGETOSERVER);
+        BufferedImage image = ImageIO.read(getClass().getResourceAsStream("sea.jpg"));
+        System.out.println(image);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", byteArrayOutputStream);
+        byteArrayOutputStream.flush();
+        byte[] imageInByte = byteArrayOutputStream.toByteArray();
+
         ImageMessageBodyDto imageMessageBodyDto = new ImageMessageBodyDto();
-        imageMessageBodyDto.setImageMessageBytes(imageFileBytes);
+        imageMessageBodyDto.setImageMessageBytes(imageInByte);
         byte[] sendJsonBytes = objectMapper.writeValueAsBytes(imageMessageBodyDto);
         HeaderConverter headerConverter = new HeaderConverter();
         headerConverter.encodeHeader(sendJsonBytes.length, inputStringAndType.type.getValue());

@@ -209,9 +209,5 @@ class ServerHandlerServiceTest {
         serverHandlerService.openImageFile(fileName);
 
         //then
-
-
-
-
     }
 }
