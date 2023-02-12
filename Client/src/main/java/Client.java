@@ -3,7 +3,6 @@ import java.io.*;
 import java.net.Socket;
 
 public class Client {
-    private static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) {
         Socket socket = null;
         try {
