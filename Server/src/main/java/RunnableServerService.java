@@ -1,8 +1,5 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,7 +10,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RunnableServerService {
     ObjectMapper objectMapper = new ObjectMapper();
-    DataOutputStreamFactory dataOutputStreamFactory = new DataOutputStreamFactory();
 
     public byte[] recieveMessageHeaderFromClient(DataInputStream dis) throws IOException {
         byte[] header = new byte[8];

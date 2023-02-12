@@ -1,5 +1,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.*;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -7,7 +10,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RunnableServer implements Runnable {
     protected Socket sock;
     private String name = null;
-    private static ObjectMapper objectMapper = new ObjectMapper();
     protected static HashMap<Socket, Integer> clients = new HashMap<>();
     private static ReentrantLock lockForClientsConcurrency = new ReentrantLock();
     public static void removeClientInClients(Socket socket) {

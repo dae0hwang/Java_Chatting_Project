@@ -7,7 +7,7 @@ public class Client {
     public static void main(String[] args) {
         Socket socket = null;
         try {
-            socket = new Socket("192.168.219.112", 5510);
+            socket = new Socket("192.168.219.158", 5510);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             //receive message Thread start
             ServerHandler handler = new ServerHandler(socket);
