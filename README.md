@@ -1,7 +1,7 @@
 # Java N:N 채팅 서비스
 Runnable Thread와 Java ServerSocket 클래스를 사용해서, 여러명이 접속할 수 있는 채팅 서버
 
-Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 Server 프로세스에 여러 Client 동작이 동시에 진행되어도 동시성 문제 없이 잘 돌아가는 채팅 서비스를 제공한다.
+Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 Server 프로세스에 여러 Client 동작이 동시에 진행되어도 동시성 문제 없이 돌아가는 채팅 서비스를 제공한다.
 
 ### 채팅 서버가 제공하는 동작
 1. 여러 Client가 접속할 수 있는 채팅 서버 생성
