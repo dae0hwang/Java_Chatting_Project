@@ -11,6 +11,19 @@ Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 Server 프로세스
 5. Client 종료 시 보낸 메세지, 받은 메세지 수 남아있는 참여자에게 보내기
 
 # 블로그 포스트
+[Java Thread 채팅 서비스 구현](https://coding-business.tistory.com/111)
+    
+    [JSON 개념과 특징 이해](https://coding-business.tistory.com/5)
+
+    [Enum의 개념과 활용 방법 이해](https://coding-business.tistory.com/8)
+    
+<백엔드 개발을 위한 네트워크 지식>
+
+[백엔드 개발을 위한 네트워크 기본 용어](https://coding-business.tistory.com/113)
+
+[라우팅과 IP주소 체계 이해](https://coding-business.tistory.com/110)
+
+[OSI, TCP/IP 참조 모델 이해](https://coding-business.tistory.com/2)
 
 
 # 채팅 서버 구성
