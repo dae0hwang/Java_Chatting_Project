@@ -28,6 +28,8 @@ Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 Server 프로세스
 
 [OSI, TCP/IP 참조 모델 이해](https://coding-business.tistory.com/2)
 
+[Well Know Port 종류 이해](https://coding-business.tistory.com/114)
+
 
 # 채팅 서버 구성
 ### 1. 여러 Client가 접속할 수 있는 채팅 서버 생성
