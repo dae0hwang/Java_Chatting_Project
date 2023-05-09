@@ -1,4 +1,11 @@
+import typedata.HeaderInformation;
+import typedata.ImageBytesAndDirectory;
+import typedata.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.CloseMessageBodyDto;
+import dto.ImageMessageBodyDto;
+import dto.StringMessageBodyDto;
+import util.HeaderConverter;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -15,7 +22,6 @@ public class ServerHandlerService {
         dataInputStream.readFully(header, 0, header.length);
         return header;
     }
-
 
     public HeaderInformation implementHeaderInformation(byte[] headerBytes) {
         HeaderConverter headerConverter = new HeaderConverter();

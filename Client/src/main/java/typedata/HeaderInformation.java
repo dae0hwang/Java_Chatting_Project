@@ -1,11 +1,13 @@
+package typedata;
+
 import lombok.Data;
 
 @Data
 public class HeaderInformation {
-    int messageBodyLength;
-    Type messageBodyType;
+    public int messageBodyLength;
+    public Type messageBodyType;
 
-    HeaderInformation(int length, Type type) {
+    public HeaderInformation(int length, Type type) {
         this.messageBodyLength = length;
         this.messageBodyType = type;
     }

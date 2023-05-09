@@ -35,6 +35,5 @@ jar {
     finalizedBy shadowJar
     manifest {
         attributes 'Main-Class': 'Client'
-
     }
 }

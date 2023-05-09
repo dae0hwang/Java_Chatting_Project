@@ -1,5 +1,10 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
+import typedata.InputStringAndType;
+import typedata.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.ImageMessageBodyDto;
+import dto.ResisterNameMessageBodyDto;
+import dto.StringMessageBodyDto;
+import util.HeaderConverter;
 
 import java.io.*;
 import java.net.Socket;
@@ -7,11 +12,10 @@ import java.nio.file.Files;
 
 public class ClientService {
     private ObjectMapper objectMapper = new ObjectMapper();
-    private Socket socket;
+
     protected DataOutputStream dataOutputStream;
 
     ClientService(Socket socket) throws IOException {
-        this.socket = socket;
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
     }
 

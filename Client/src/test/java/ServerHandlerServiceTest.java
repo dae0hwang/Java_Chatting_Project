@@ -1,4 +1,10 @@
+import typedata.HeaderInformation;
+import typedata.ImageBytesAndDirectory;
+import typedata.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.CloseMessageBodyDto;
+import dto.ImageMessageBodyDto;
+import dto.StringMessageBodyDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

@@ -1,3 +1,6 @@
+import typedata.HeaderInformation;
+import typedata.ImageBytesAndDirectory;
+import typedata.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.Socket;

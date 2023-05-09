@@ -1,4 +1,5 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
+import typedata.Type;
+import util.DataOutputStreamFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class RunnableServer implements Runnable {
         }
     }
     private ThreadLocal<Integer> threadLocalClientSendMessageNum = new ThreadLocal<>();
+
     public static  void clientReceiveMessageNumPlus1(Socket socket) {
         clients.put(socket, clients.getOrDefault(socket, 0) + 1);
     }
@@ -66,7 +68,7 @@ public class RunnableServer implements Runnable {
                         byte[] stringMessageServerHeader
                             = serverService.implementStringMessageServerHeaderBytes(stringMessageJsonBytes);
                         serverMessageType = serverService.checkMessageType(stringMessageServerHeader);
-                        serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
+                        serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);//
                         serverService.broadcastAllUser(serverMessageType, clients, dataOutputStreamFactory
                             , sock, stringMessageJsonBytes, stringMessageServerHeader, lockForClientsConcurrency);
                         break;
@@ -79,7 +81,7 @@ public class RunnableServer implements Runnable {
                         serverMessageType = serverService.checkMessageType(imageMessageServerHeader);
                         serverService.broadcastAllUser(serverMessageType, clients, dataOutputStreamFactory
                             , sock, imageMessageJsonBytes, imageMessageServerHeader, lockForClientsConcurrency);
-                        serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);
+                        serverService.treatReceiveNumPlus(serverMessageType, clients, sock, lockForClientsConcurrency);//
                         break;
                 }
             }

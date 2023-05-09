@@ -1,10 +1,12 @@
+package util;
+
 import java.util.Arrays;
 
 //HeaderTypeConversion
 public class HeaderConverter {
-    protected int messageLength;
-    protected int messageType;
-    protected byte[] bytesHeader = new byte[8];
+    public int messageLength;
+    public int messageType;
+    public byte[] bytesHeader = new byte[8];
 
     //headerbyte -> int length and int type
     public void decodeHeader(byte[] header) {

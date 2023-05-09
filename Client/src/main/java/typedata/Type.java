@@ -1,3 +1,5 @@
+package typedata;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,6 +14,5 @@ public enum Type {
     IMAGETOCLIENT(6666);
 
     private final int value;
-
 }
 
