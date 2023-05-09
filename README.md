@@ -13,9 +13,9 @@ Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 Server 프로세스
 # 블로그 포스트
 [Java Thread 채팅 서비스 구현](https://coding-business.tistory.com/111)
     
-[JSON 개념과 특징 이해](https://coding-business.tistory.com/5)
+&nbsp;[JSON 개념과 특징 이해](https://coding-business.tistory.com/5)
 
-[Enum의 개념과 활용 방법 이해](https://coding-business.tistory.com/8)
+&nbsp;[Enum의 개념과 활용 방법 이해](https://coding-business.tistory.com/8)
     
 
 
