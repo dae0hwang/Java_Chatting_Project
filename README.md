@@ -20,7 +20,7 @@ Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 Server 프로세스
 
 
 
-<백엔드 개발을 위한 네트워크 지식>
+**<백엔드 개발을 위한 네트워크 지식>**
 
 [백엔드 개발을 위한 네트워크 기본 용어](https://coding-business.tistory.com/113)
 
