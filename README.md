@@ -6,29 +6,9 @@ Thread, ThreadLocal, ReentrantLock을 사용해서 하나의 채팅서버에서 
 ### 채팅 서버가 제공하는 동작
 1. 여러 Client가 접속할 수 있는 채팅 서버 생성
 2. Client 입장 시 이름을 먼저 등록해야 채팅 메세지 작성 가능하도록 설정
-3. 프로토콜([Header : [길이][패킷종류]] - [Body])을 사용하여 Client 데이터 구분 (이름 등록, 메세지, 이미지파일)
+3. Header와 Body로 구성된 형태의 프로토콜을 구현하여 다양한 종류와 길이의 데이터를 통신
 4. Client 메세지 채팅 서버 참여자에게 전부 전송
 5. Client 종료 시 보낸 메세지, 받은 메세지 수 남아있는 참여자에게 전송
-
-# 블로그 포스트
-[Java Thread 채팅 서비스 구현](https://coding-business.tistory.com/111)
-    
-&nbsp;&nbsp;&nbsp;&nbsp;[JSON 개념과 특징 이해](https://coding-business.tistory.com/5)
-
-&nbsp;&nbsp;&nbsp;&nbsp;[Enum의 개념과 활용 방법 이해](https://coding-business.tistory.com/8)
-    
-
-
-**<백엔드 개발을 위한 네트워크 지식>**
-
-[백엔드 개발을 위한 네트워크 기본 용어](https://coding-business.tistory.com/113)
-
-[라우팅과 IP주소 체계 이해](https://coding-business.tistory.com/110)
-
-[OSI, TCP/IP 참조 모델 이해](https://coding-business.tistory.com/2)
-
-[Well Know Port 종류 이해](https://coding-business.tistory.com/114)
-
 
 # 채팅 서버 구성
 ### 1. 여러 Client가 접속할 수 있는 채팅 서버 생성
@@ -49,23 +29,10 @@ Client는 채팅 서버에 입장할 대 먼저 이름을 등록해야 채팅에
 
 [동작 로직 설명](https://coding-business.tistory.com/111#client-%EC%9E%85%EC%9E%A5-%EC%8B%9C-%EC%9D%B4%EB%A6%84%EC%9D%84-%EB%A8%BC%EC%A0%80-%EB%93%B1%EB%A1%9D%ED%95%B4%EC%95%BC-%EC%B1%84%ED%8C%85-%EB%A9%94%EC%84%B8%EC%A7%80-%EC%9E%91%EC%84%B1-%EA%B0%80%EB%8A%A5%ED%95%98%EB%8F%84%EB%A1%9D-%EC%84%A4%EC%A0%95)
 
-### 3. 프로토콜([Header : [길이][패킷종류]] - [Body])을 사용하여 Client 데이터 구분 (이름 등록, 메세지, 이미지파일)
-<img width="80%" src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F31lXI%2FbtsdZNtPlda%2FgkbfCBhi0xNTk7CWIY10aK%2Fimg.png">
-
-위 바이트 배열은 이름을 등록을 위한 Client Data이고,
-
-아래 바이트 배열은 Client의 메세지 데이터입니다.
-
-단순 바이트 배열로는 데이터가 메세지인지 사진인지 이름인지 파악할 수 없습니다.
+### 3. Header와 Body로 구성된 형태의 프로토콜을 구현하여 다양한 종류와 길이의 데이터를 통신
+채팅 서버에 사용한 프로토콜 형식은 [Header : [길이(4바이트)][메세지 종류(4바이트)]] - [Body] 입니다. 먼저 고정된 8바이트 크기의 헤더 데이터를 교환합니다. 헤더에는 실제 데이터가 담긴 바디의 길이와 메세지 종류 정보가 담겨 있습니다. 헤더에 명시된 길이만큼 데이터를 받아오고, 메시지 종류에 맞게 로직을 처리할 수 있습니다.
 
 <img width="80%" src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fnd37J%2FbtsdZz3HSSe%2FHOJuNtSsCge6BQGskfcTyK%2Fimg.png">
-
-
-그래서 Client와 Server가 상호 협의한 프로토콜을 이용해서 해당 데이터가 어떤 데이터인지 파악할 수 있도록 했습니다.
-
-제가 사용한 프로토콜은\[Header : \[길이(4바이트)\]\[패킷 종류(4바이트)\]\] \[Body\]입니다.
-
-먼저 고정된 길이의 8바이트 헤더를 통해 다음에 오는 Body 데이터의 종류(메세지,이름,사진)와 길이를 파악해 데이터를 잘 저장하고 서버가 타입 별 처리를 할 수 있습니다.
 
 <img width="80%" src="https://blog.kakaocdn.net/dn/qXDQL/btsd0RWHIfB/jkqFNcc4NZHF8fewDJXnT1/img.gif">
 
