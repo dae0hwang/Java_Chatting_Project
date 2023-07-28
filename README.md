@@ -69,7 +69,7 @@ Client는 채팅 서버에 입장할 대 먼저 이름을 등록해야 채팅에
 
 <img width="80%" src="https://blog.kakaocdn.net/dn/qXDQL/btsd0RWHIfB/jkqFNcc4NZHF8fewDJXnT1/img.gif">
 
-[동작 로직 설명](https://coding-business.tistory.com/111#%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C[header--[%EA%B8%B8%EC%9D%B4][%ED%8C%A8%ED%82%B7%EC%A2%85%EB%A5%98]]---[body]%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-client-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B5%AC%EB%B6%84%ED%95%98%EA%B8%B0-%EC%9D%B4%EB%A6%84-%EB%93%B1%EB%A1%9D,-%EB%A9%94%EC%84%B8%EC%A7%80,-%EC%9D%B4%EB%AF%B8%EC%A7%80%ED%8C%8C%EC%9D%BC)
+[동작 로직 설명](https://coding-business.tistory.com/111#header%EC%99%80-body%EB%A1%9C-%EA%B5%AC%EC%84%B1%EB%90%9C-%ED%98%95%ED%83%9C%EC%9D%98-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C%EC%9D%84-%EA%B5%AC%ED%98%84%ED%95%98%EC%97%AC-%EB%8B%A4%EC%96%91%ED%95%9C-%EC%A2%85%EB%A5%98%EC%99%80-%EA%B8%B8%EC%9D%B4%EC%9D%98-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%A5%BC-%ED%86%B5%EC%8B%A0-%EC%9D%B4%EB%A6%84-%EB%93%B1%EB%A1%9D,-%EB%AC%B8%EC%9E%90-%EB%A9%94%EC%84%B8%EC%A7%80,-%EC%9D%B4%EB%AF%B8%EC%A7%80%ED%8C%8C%EC%9D%BC)
 
 ### 4. Client 메세지 채팅 서버 참여자에게 전송
 Client가 작성한 메세지를 Server 채팅 방에서 참여한 모든 Client에게 전송합니다.
