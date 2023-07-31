@@ -6,6 +6,7 @@ Java Sokcet과 Thread를 사용하여 여러 명이 참여할 수 있는 단체 
 ## 프로젝트 동작
 ### 1. 여러명이 접속할 수 있는 채팅 서버 생성
 Server Socker을 열어두고, 해당 서버로 들어오는 Client Socket을 Thread로 등록하여 여러 명이 접속할 수 있습니다. [동작 로직 설명](https://coding-business.tistory.com/111#%EC%97%AC%EB%9F%AC-client%EA%B0%80-%EC%A0%91%EC%86%8D%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8A%94-%EC%84%9C%EB%B2%84-%EC%83%9D%EC%84%B1)
+
 <img width="50%" src="https://blog.kakaocdn.net/dn/mWDS6/btsd0o1yGu4/n1GHVjJDY5irPoBftWuR2K/img.gif"/>
 
 
